@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=Concurs
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  node:
+    build: server/
+    image: airsunday/node-app
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=123
+      - DATABASE_NAME=Concurs
+      - DATABASE_HOST=postgres # NAME OF THE SERVICE
+      - SESSION_SECRET=VerySecret
+    depends_on:
+      - postgres
+  vue:
+    build: client/
+    image: airsunday/vue-app
+    ports:
+      - 80:8080
+    depends_on:
+      - node
+
+volumes:
+  postgres:
+    driver: local
+#    external: true
