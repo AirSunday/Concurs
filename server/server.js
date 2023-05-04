@@ -9,6 +9,7 @@ const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const cookieParser = require("cookie-parser");
 const passportConfig = require("./app/config/passport");
 const sequelize = require("./app/models/index").sequelize;
+const multer  = require("multer");
 
 require("./app/models/person.model.js");
 require("./app/models/session.model.js");
@@ -25,42 +26,35 @@ app.use(
 );
 
 app.use(function (req, res, next) {
-  // Website you wish to allow to connec
   // res.setHeader("Access-Control-Allow-Origin", "http://188.68.222.76");
   // res.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
   res.setHeader("Access-Control-Allow-Origin", "http://45.131.41.167");
 
-  // Request methods you wish to allow
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
   );
-
-  // Request headers you wish to allow
   res.setHeader(
     "Access-Control-Allow-Headers",
     "X-Requested-With,content-type"
   );
-
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
   res.setHeader("Access-Control-Allow-Credentials", true);
 
-  // Pass to next layer of middleware
   next();
 });
 
-// parse requests of content-type - application/json
 app.use(bodyParser.json());
 app.use(cookieParser());
-// parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
-// simple route
+app.use(multer({dest:"app/uploads"}).single("filedata"));
+
+
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to Nastya app" });
 });
 require("./app/routes/concurs.routes.js")(app);
-// set port, listen for requests
+
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
@@ -74,7 +68,6 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: false,
-      // credentials: 'include',
       secure: false,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 1 month
     },

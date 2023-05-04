@@ -206,8 +206,9 @@ export default {
   box-shadow: none;
   transition: 0.25s;
   display: block;
-  width: 30%;
-  right: 0;
+  width: 20%;
+  right: calc((100vw - 1058px) / 2);
+  top: 20px;
   margin: 0;
 }
 
@@ -313,6 +314,13 @@ input:focus {
 
 .app-down:hover{
   opacity: 0.6;
+}
+
+@media screen and (max-width: 1000px) {
+  .AuthFormTitle{
+    right: 0;
+    width: 40%;
+  }
 }
 
 </style>

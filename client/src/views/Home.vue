@@ -1,7 +1,8 @@
 <template>
+  <AuthForm/>
+  <AddCompetition/>
   <div class="MainScreen">
-    <AuthForm/>
-    <AddCompetition/>
+    <div class="spaceEmpty"></div>
     <div class="wrapper" v-for="(competition,key) in Competition" :key="key">
       <div class="content-splitter">
         <div class="left">
@@ -10,12 +11,12 @@
             <div class="content">{{competition.minitext}}</div>
             <div class="down-content">
               <div class="down-content-left">
-                <p>Начало: {{competition.datestart.split('T')[0]}}</p>
+                <p>Старт: {{competition.datestart.split('T')[0]}}</p>
                 <p>Конец: {{competition.dateend.split('T')[0]}}</p>
               </div>
               <div class="down-content-right">
                 <p>Организатор</p>
-                <p>Имя организатора</p>
+                <p>{{competition.organizer_name}}</p>
               </div>
             </div>
           </div>
@@ -57,6 +58,7 @@ export default {
     GetCompetition(){
       Concurs.getCompetition().then((response) => {
         this.Competition = response.data;
+
       })
     },
   }
@@ -78,6 +80,11 @@ export default {
   background-color: #f6e8e8;
 }
 
+.spaceEmpty {
+  height: 4vh;
+  width: 100px;
+}
+
 .wrapper {
   display: grid;
   grid-template-columns: 5fr 5fr;
@@ -92,6 +99,7 @@ export default {
 
 .wrapper:hover {
   opacity: 0.7;
+  transition: 0.5s;
 }
 
 .header{

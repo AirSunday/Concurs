@@ -1,5 +1,4 @@
 <template>
-  <div class="spaceEmpty"></div>
   <button class="btn" @click="ModView = !ModView">Создать конкурс</button>
   <div v-if="!ModView"  class="AddCompetitionForm">
 
@@ -7,7 +6,7 @@
       <div class="app-title">
         <h1>Форма добавления конкурса</h1>
       </div>
-      <h1 class="close" @click="ModView = !ModView;">&#10006;</h1>
+      <h1 class="close" @click="CloseFunction">&#10006;</h1>
     </div>
 
     <div class="control-group">
@@ -15,27 +14,28 @@
       <label class="login-field-icon fui-user"></label>
     </div>
     <div class="control-group">
-      <input type="text" class="login-field" v-model="minitext" placeholder="Краткое описание">
+      <input type="text" maxlength="200" class="login-field" v-model="minitext" placeholder="Краткое описание">
       <label class="login-field-icon fui-user"></label>
     </div>
     <div class="control-group">
-      <input type="text" class="login-field" v-model="fulltext" placeholder="Полное описание">
+      <textarea id="message" name="message" rows="10" cols="50" v-model="fulltext" placeholder="Полное описание"></textarea>
       <label class="login-field-icon fui-user"></label>
     </div>
     <div class="control-group">
-      <input type="text" class="login-field" v-model="datestart" placeholder="Дата начала">
+      <VueDatePicker class="DatePicker" v-model="datestart" :format="customDateFormat" :language="language" placeholder="Дата начала"/>
       <label class="login-field-icon fui-user"></label>
     </div>
     <div class="control-group">
-      <input type="text" class="login-field" v-model="dateend" placeholder="Дата конца">
+      <VueDatePicker class="DatePicker"  v-model="dateend" :format="customDateFormat" :language="language" placeholder="Дата конца"/>
       <label class="login-field-icon fui-user"></label>
     </div>
-    <div class="control-group">
-      <input type="text" class="login-field" v-model="image" placeholder="Картинка">
-      <label class="login-field-icon fui-user"></label>
+    <div class="control-group imgPicker">
+      <input type="file" id="fileUpload" @change="onFileChange" hidden/>
+      <button class="input-file-btn" @click="chooseFiles()">Выберите картинку</button>
+      <p v-if="file">Картинка загружена</p>
     </div>
 
-    <button class="btn-second" @click="AddCompetition">Создать конкурс</button>
+    <button class="btn-second" @click.prevent="AddCompetition">Создать конкурс</button>
   </div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
@@ -43,12 +43,17 @@
 <script>
 import Concurs from "@/services/Concurs";
 import AlertMessages from '@/components/AlertMessages.vue';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
   name: "AddCompetition",
-  components: {AlertMessages},
+  components: {AlertMessages, VueDatePicker },
   data() {
     return{
+      selectedDate: null,
+      customDateFormat: 'dd.MM.yyyy',
+      language: 'ru',
       ModView: true,
       organizer_id: '',
       name: '',
@@ -57,6 +62,7 @@ export default {
       datestart: '',
       dateend: '',
       image: '',
+      file: null
     }
   },
   created() {
@@ -65,6 +71,21 @@ export default {
   methods: {
     AddAlert(mess){
       this.$refs.AddAlertMess.AddAlertMess(mess);
+    },
+    CloseFunction(){
+      this.ModView = !this.ModView;
+      this.name = '';
+      this.minitext = '';
+      this.fulltext = '';
+      this.datestart = '';
+      this.dateend = '';
+      this.file = null;
+    },
+    chooseFiles: function() {
+      document.getElementById("fileUpload").click()
+    },
+    onFileChange(e) {
+      this.file = e.target.files[0];
     },
     CheckSession() {
       Concurs.Authentication()
@@ -87,21 +108,20 @@ export default {
           this.fulltext === '' ||
           this.datestart === '' ||
           this.dateend === '' ||
-          this.image === '') {
+          this.file === null) {
         this.AddAlert({ status: false, message: "Заполните все поля" });
         return;
       }
       this.ModView = !this.ModView;
-      const competition = {
-        organizer_id: this.organizer_id,
-        name: this.name,
-        minitext: this.minitext,
-        fulltext: this.fulltext,
-        datestart: this.datestart,
-        dateend: this.dateend,
-        image: this.image,
-      }
-      Concurs.createCompetition(competition).then((response) => {
+      let formData = new FormData();
+      formData.append("filedata", this.file);
+      formData.append("userId", this.organizer_id);
+      formData.append("name", this.name);
+      formData.append("datestart", this.datestart);
+      formData.append("dateend", this.dateend);
+      formData.append("fulltext", this.fulltext);
+      formData.append("minitext", this.minitext);
+      Concurs.createCompetition(formData).then((response) => {
         console.log(response)
         if(response.statusText == "OK")
           this.AddAlert({ status: true, message: "Успешное добавление" });
@@ -114,19 +134,42 @@ export default {
 </script>
 
 <style scoped>
-.spaceEmpty {
-  height: 4vh;
+
+.input-file-btn {
+  border: 2px solid transparent;
+  background: #e0b5b5;
+  color: #ffffff;
+  font-size: calc(0.4em + 1vw);
+  line-height: 25px;
+  padding: 0.5vw 1vw;
+  text-align: left;
+  transition: 0.25s;
+  width: 80%;
+}
+
+.imgPicker img{
   width: 100px;
+  height: 100px;
+}
+
+.DatePicker {
+  border: 2px solid transparent;
+  border-radius: 3px;
+  font-size: 16px;
+  font-weight: 200;
+  padding: 10px 0;
+  width: 100%;
+  transition: border .5s;
 }
 
 .AddCompetitionForm{
   position: fixed;
-  top: 25vw;
+  top: 10vw;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, 0);
   width: 50%;
   min-width: 300px;
-  z-index: 2;
+  z-index: 3;
   padding: 10px;
   background: #fff;
   border: 1px solid #000;
@@ -151,7 +194,7 @@ export default {
 
 .app-title {
   width: 90%;
-  font-size: 0.8em;
+  font-size: calc(0.2em + 1vw);
 }
 .control-group {
   margin-bottom: 10px;
@@ -164,7 +207,7 @@ input {
   font-size: 16px;
   font-weight: 200;
   padding: 10px 0;
-  width: 80%;
+  width: 100%;
   transition: border .5s;
 }
 
@@ -173,8 +216,27 @@ input:focus {
   box-shadow: none;
 }
 
+textarea{
+  background-color: #ECF0F1;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  font-size: 16px;
+  font-weight: 200;
+  padding: 10px 0;
+  width: 100%;
+  height: 80%;
+  resize: none;
+  transition: border .5s;
+}
+
+textarea:focus {
+  border: 2px solid #debcbc;
+  box-shadow: none;
+}
+
 .btn {
   position: absolute;
+  z-index: 3;
   border: 2px solid transparent;
   background: #e0b5b5;
   color: #ffffff;
@@ -187,8 +249,9 @@ input:focus {
   box-shadow: none;
   transition: 0.25s;
   display: block;
-  width: 30%;
-  left: 0;
+  width: 20%;
+  left: calc((100vw - 1058px) / 2);
+  top: 20px;
 }
 
 .btn-second{
@@ -198,7 +261,7 @@ input:focus {
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
   padding: 0.5vw 1vw;
-  text-align: right;
+  text-align: center;
   text-decoration: none;
   text-shadow: none;
   box-shadow: none;
@@ -213,5 +276,12 @@ input:focus {
 
 .btn-second:hover {
   background-color: #e7cbcb;
+}
+
+@media screen and (max-width: 1000px) {
+  .btn{
+    left: 0;
+    width: 40%;
+  }
 }
 </style>

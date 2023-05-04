@@ -25,6 +25,9 @@ async function CreateOrganizer(userId, res) {
 }
 
 exports.create = (req, res) => {
+    const filedata = req.file;
+    if(!filedata)
+        res.send("Ошибка при загрузке файла");
     CreateOrganizer(req.body.userId, res).then((organizer) => {
         Competition.create({
             organizer_id: organizer.id,
@@ -33,7 +36,7 @@ exports.create = (req, res) => {
             fulltext: req.body.fulltext,
             datestart: req.body.datestart,
             dateend: req.body.dateend,
-            image: req.body.image,
+            image: req.file.path,
         }).then(() => {
             res.status(200).send({
                 message: "creat Competition",
@@ -88,11 +91,28 @@ exports.createJudge = (req, res) => {
 
 exports.getCompetition = (req, res) => {
     Competition.findAll().then((data) => {
-        const imagePath = `../img/giga.png`;
-        res.status(200).send(data);
-    }).catch(() => {
+        const promises = data.map(competition => {
+            return Organizer.findOne({ where: { id: competition.dataValues.organizer_id } })
+                .then(organizer => {
+                    return Person.findOne({ where: { id: organizer.dataValues.person_id } })
+                        .then(person => {
+                            return {
+                                name: competition.dataValues.name,
+                                minitext: competition.dataValues.minitext,
+                                datestart: competition.dataValues.datestart,
+                                dateend: competition.dataValues.dateend,
+                                organizer_name: person.dataValues.name
+                            };
+                        });
+                });
+        });
+        return Promise.all(promises);
+    }).then(response => {
+        res.status(200).send(response);
+    }).catch(err => {
         res.status(500).send({
-            message: "Error creating Judge",
+            message: "Error sending competition",
+            error: err
         });
     });
 }
