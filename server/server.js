@@ -17,8 +17,8 @@ require("./app/models/session.model.js");
 app.use(
   cors({
     origin: [
-      "http://45.131.41.167",
-      // 'http://localhost:8081',
+      // "http://45.131.41.167",
+      'http://localhost:8081',
     ],
     credentials: true,
     exposedHeaders: ["set-cookie"],
@@ -27,8 +27,8 @@ app.use(
 
 app.use(function (req, res, next) {
   // res.setHeader("Access-Control-Allow-Origin", "http://188.68.222.76");
-  // res.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
-  res.setHeader("Access-Control-Allow-Origin", "http://45.131.41.167");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
+  // res.setHeader("Access-Control-Allow-Origin", "http://45.131.41.167");
 
   res.setHeader(
     "Access-Control-Allow-Methods",

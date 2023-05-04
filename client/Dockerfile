@@ -1,5 +1,5 @@
 # base image
-FROM node:14.16.1-alpine3.13
+FROM node:16.4.2
 
 # set working directory
 WORKDIR /client
