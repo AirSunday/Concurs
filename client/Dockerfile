@@ -1,5 +1,5 @@
 # base image
-FROM node:16.4.2
+FROM node:lts-alpine as build-stage
 
 # set working directory
 WORKDIR /client
