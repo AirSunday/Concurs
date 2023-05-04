@@ -33,8 +33,8 @@
           </div>
         </div>
 
-        <div class="btn btn-primary btn-large btn-block" v-if="ModeViewAuthForm === 'Регистрация'" @click="Sign">{{ ModeViewAuthForm }}</div>
-        <div class="btn btn-primary btn-large btn-block" v-else @click="Login">{{ ModeViewAuthForm }}</div>
+        <div class="btn" v-if="ModeViewAuthForm === 'Регистрация'" @click="Sign">{{ ModeViewAuthForm }}</div>
+        <div class="btn" v-else @click="Login">{{ ModeViewAuthForm }}</div>
 
         <div class="app-down">
           <h1 @click="ChangeModeAuthForm">{{ ReverseModeViewAuthForm }}</h1>
@@ -51,7 +51,7 @@
     </div>
   </div>
 
-  <p class="AuthFormTitle" @click="viewAuthForm = !viewAuthForm; CheckSession();">{{ PAuthStatus }}</p>
+  <button class="AuthFormTitle" @click="viewAuthForm = !viewAuthForm; CheckSession();">{{ PAuthStatus }}</button>
 <AlertMessages ref="AddAlertMess"/>
 </template>
 
@@ -192,12 +192,27 @@ export default {
 
 <style scoped>
 .AuthFormTitle{
-  position: fixed;
-  right: 30px;
-  top: 0;
-  background: #bdd6e7;
-  padding: 10px;
-  border-radius: 30px;
+  position: absolute;
+  z-index: 3;
+  border: 2px solid transparent;
+  background: #e0b5b5;
+  color: #ffffff;
+  font-size: calc(0.5em + 1vw);
+  line-height: 25px;
+  padding: 0.5vw 1vw;
+  text-align: left;
+  text-decoration: none;
+  text-shadow: none;
+  box-shadow: none;
+  transition: 0.25s;
+  display: block;
+  width: 30%;
+  right: 0;
+  margin: 0;
+}
+
+.AuthFormTitle:hover {
+  background-color: #e7cbcb;
 }
 
 .AuthFormMain{
@@ -267,20 +282,19 @@ input {
 }
 
 input:focus {
-  border: 2px solid #3498DB;
+  border: 2px solid #e0b5b5;
   box-shadow: none;
 }
 
 .btn {
   border: 2px solid transparent;
-  background: #3498DB;
+  background: #e0b5b5;
   color: #ffffff;
   font-size: 16px;
   line-height: 25px;
   padding: 10px 0;
   text-decoration: none;
   text-shadow: none;
-  border-radius: 3px;
   box-shadow: none;
   transition: 0.25s;
   display: block;
@@ -289,7 +303,7 @@ input:focus {
 }
 
 .btn:hover {
-  background-color: #2980B9;
+  background-color: #e0b5b5;
 }
 
 .app-down{

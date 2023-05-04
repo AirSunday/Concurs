@@ -1,6 +1,7 @@
 <template>
-  <button v-if="ModView" class="btn btn-primary btn-large btn-block" @click="ModView = !ModView">Добавить Конкурс</button>
-  <div v-else class="AddCompetitionForm">
+  <div class="spaceEmpty"></div>
+  <button class="btn" @click="ModView = !ModView">Создать конкурс</button>
+  <div v-if="!ModView"  class="AddCompetitionForm">
 
     <div class="title">
       <div class="app-title">
@@ -34,7 +35,7 @@
       <label class="login-field-icon fui-user"></label>
     </div>
 
-    <button class="btn btn-primary btn-large btn-block" @click="AddCompetition">Добавить Конкурс</button>
+    <button class="btn-second" @click="AddCompetition">Создать конкурс</button>
   </div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
@@ -113,17 +114,22 @@ export default {
 </script>
 
 <style scoped>
+.spaceEmpty {
+  height: 4vh;
+  width: 100px;
+}
 
 .AddCompetitionForm{
   position: fixed;
-  top: 50%;
+  top: 25vw;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 50%;
   min-width: 300px;
-  z-index: 4;
+  z-index: 2;
   padding: 10px;
-  background: #bdd6e7;
+  background: #fff;
+  border: 1px solid #000;
   border-radius: 30px;
 }
 .title{
@@ -163,28 +169,49 @@ input {
 }
 
 input:focus {
-  border: 2px solid #3498DB;
+  border: 2px solid #debcbc;
   box-shadow: none;
 }
 
 .btn {
+  position: absolute;
   border: 2px solid transparent;
-  background: #3498DB;
+  background: #e0b5b5;
   color: #ffffff;
-  font-size: 16px;
+  font-size: calc(0.5em + 1vw);
   line-height: 25px;
-  padding: 10px 0;
+  padding: 0.5vw 1vw;
+  text-align: right;
   text-decoration: none;
   text-shadow: none;
-  border-radius: 3px;
+  box-shadow: none;
+  transition: 0.25s;
+  display: block;
+  width: 30%;
+  left: 0;
+}
+
+.btn-second{
+  border: 2px solid transparent;
+  background: #e0b5b5;
+  color: #ffffff;
+  font-size: calc(0.5em + 1vw);
+  line-height: 25px;
+  padding: 0.5vw 1vw;
+  text-align: right;
+  text-decoration: none;
+  text-shadow: none;
   box-shadow: none;
   transition: 0.25s;
   display: block;
   width: 50%;
-  margin: 0 auto;
 }
 
 .btn:hover {
-  background-color: #2980B9;
+  background-color: #e7cbcb;
+}
+
+.btn-second:hover {
+  background-color: #e7cbcb;
 }
 </style>
