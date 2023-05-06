@@ -17,7 +17,7 @@ require("./app/models/session.model.js");
 app.use(
   cors({
     origin: [
-      "http://http://whoisa.ru",
+      "https://whoisa.ru",
       // 'http://localhost:8081',
     ],
     credentials: true,
@@ -28,7 +28,7 @@ app.use(
 app.use(function (req, res, next) {
   // res.setHeader("Access-Control-Allow-Origin", "http://188.68.222.76");
   // res.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
-  res.setHeader("Access-Control-Allow-Origin", "http://http://whoisa.ru");
+  res.setHeader("Access-Control-Allow-Origin", "https://whoisa.ru");
 
   res.setHeader(
     "Access-Control-Allow-Methods",
