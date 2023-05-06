@@ -17,8 +17,8 @@ require("./app/models/session.model.js");
 app.use(
   cors({
     origin: [
-      // "http://45.131.41.167",
-      'http://localhost:8081',
+      "http://45.131.41.167",
+      // 'http://localhost:8081',
     ],
     credentials: true,
     exposedHeaders: ["set-cookie"],
