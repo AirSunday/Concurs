@@ -119,6 +119,7 @@ export default {
                   this.Password = "";
                   this.Repassword = "";
                   this.viewAuthForm = false;
+                  this.reloadPage();
                 }
                 else
                   this.AddAlert({ status: false, message: "Ошибка в авторизации" });
@@ -154,6 +155,7 @@ export default {
                             this.Password = "";
                             this.Repassword = "";
                             this.viewAuthForm = false;
+                            this.reloadPage();
                           }
                           else this.AddAlert({ status: false, message: "Ошибка в регистрации" });
                         })
@@ -177,6 +179,7 @@ export default {
                   this.Password = "";
                   this.Repassword = "";
                   this.viewAuthForm = false;
+                  this.reloadPage();
                 }
                 else
                   this.AddAlert({ status: false, message: "Ошибка в выходе" });
@@ -185,6 +188,9 @@ export default {
                 this.AddAlert({ status: false, message: "Ошибка в выходе" });
               });
         },
+        reloadPage() {
+          location.reload();
+        }
     },
     components: { AlertMessages }
 }
@@ -207,7 +213,7 @@ export default {
   transition: 0.25s;
   display: block;
   width: 20%;
-  right: calc((100vw - 1058px) / 2);
+  right: calc((100vw - 1076px) / 2);
   top: 20px;
   margin: 0;
 }
@@ -226,7 +232,7 @@ export default {
   max-width: 500px;
   z-index: 4;
   padding: 10px;
-  background: #bdd6e7;
+  background: #e1cfcf;
   border-radius: 30px;
 }
 

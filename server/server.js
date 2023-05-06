@@ -27,8 +27,8 @@ app.use(
 
 app.use(function (req, res, next) {
   // res.setHeader("Access-Control-Allow-Origin", "http://188.68.222.76");
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
-  // res.setHeader("Access-Control-Allow-Origin", "http://45.131.41.167");
+  // res.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
+  res.setHeader("Access-Control-Allow-Origin", "http://45.131.41.167");
 
   res.setHeader(
     "Access-Control-Allow-Methods",

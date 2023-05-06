@@ -1,0 +1,167 @@
+<template>
+  <div class="wrapper" @click="$router.push('/competition/' + competition.id)">
+    <div class="content-splitter">
+      <div class="left">
+        <div class="block">
+          <div class="header">{{competition.name}}</div>
+          <div class="content">{{competition.minitext}}</div>
+          <div class="down-content">
+            <div class="down-content-left">
+              <p>Старт: {{competition.datestart.split('T')[0]}}</p>
+              <p>Конец: {{competition.dateend.split('T')[0]}}</p>
+            </div>
+            <div class="down-content-right">
+              <p>Организатор</p>
+              <p>{{competition.organizer_name}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <img :src="imageUrl" alt="">
+    </div>
+  </div>
+</template>
+
+<script>
+
+export default {
+  name: "cardCompetiyion",
+  data() {
+    return {
+      imageUrl: '',
+    };
+  },
+  props: {
+    competition: {
+      type: Object,
+      required: true
+    }
+  },
+  created(){
+    // this.imageUrl = "http://localhost:8080/api/image/" + this.competition.image_path;
+    this.imageUrl = "http://45.131.41.167:8080/api/image/" + this.competition.image_path;
+  },
+  methods: {
+  }
+}
+</script>
+
+<style scoped>
+.wrapper {
+  display: grid;
+  grid-template-columns: 5fr 5fr;
+  width: 80%;
+  height: 500px;
+  max-width: 900px;
+  min-width: 250px;
+  margin-top: 20px;
+  background: hsl(0,0%,95%);
+  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
+}
+
+.wrapper:hover {
+  opacity: 0.7;
+  transition: 0.5s;
+}
+
+.header{
+  word-wrap: break-word;
+  text-align: left;
+  font-size: calc(1em + 1vw);
+  color: transparent;
+  -webkit-text-stroke: 1px #222222;
+}
+
+.content-splitter {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.left {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+  padding-left: 1em;
+  width: max(80px, 90%);
+  height: 500px;
+}
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: .75em;
+}
+.content {
+  font-size: calc(0.4em + 1vw);
+  text-align: justify;
+  color: #404040;
+}
+
+.down-content{
+  width: 100%;
+  position: absolute;
+  bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  font-size: calc(0.2em + 1vw);
+}
+
+.down-content p {
+  margin: 2px;
+  white-space: nowrap;
+}
+
+.down-content-left{
+  text-align: left;
+}
+
+.down-content-right{
+  text-align: right;
+}
+
+.right {
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(35% 0%, 100% 0, 100% 100%, 8% 100%);
+  object-fit: cover;
+  /*width: max(80px, 50%);*/
+}
+.right img {
+  position: absolute;
+  right: 0;
+  height: 100%;
+}
+
+@media screen and (max-width: 500px) {
+  .wrapper {
+    grid-template-columns: 7fr 3fr;
+    height: 300px;
+  }
+  .right img {
+    height: 300px;
+  }
+  .left {
+    height: 300px;
+  }
+  .down-content{
+    width: 90%;
+    font-size: calc(0.3em + 1vw);
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .content {
+    font-size: 1.2em;
+  }
+  .down-content{
+    font-size: 1em;;
+  }
+  .header{
+    font-size: 2em;;
+  }
+}
+
+</style>

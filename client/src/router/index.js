@@ -7,6 +7,10 @@ const routes = [
     path: "/",
     name: "HomeMain",
     component: () => import("@/views/Home.vue"),
+  }, {
+    path: "/competition/:id",
+    name: "CompetitionPage",
+    component: () => import("@/views/Competition.vue"),
   },
 ];
 

@@ -1,10 +1,10 @@
 <template>
-  <button class="btn" @click="ModView = !ModView">Создать конкурс</button>
+  <button class="btn" @click="ModView = !ModView">Изменить конкурс</button>
   <div v-if="!ModView"  class="AddCompetitionForm">
 
     <div class="title">
       <div class="app-title">
-        <h1>Форма добавления конкурса</h1>
+        <h1>Форма изменения конкурса</h1>
       </div>
       <h1 class="close" @click="CloseFunction">&#10006;</h1>
     </div>
@@ -30,23 +30,13 @@
       <label class="login-field-icon fui-user"></label>
     </div>
 
-    <div class="cardCriteria" v-for="(criteria,key) in criterias" :key="key">
-      <input type="text" maxlength="50" v-model="criteria.name" placeholder="Название критерия">
-      <input type="number" v-model="criteria.maxscore" min="0" placeholder="Максимальная оценка">
-      <p class="cardCriteriaP" @click="deleteCriteria(key)">&#128465;</p>
-    </div>
-
-    <div class="control-group">
-      <button class="input-file-btn" @click="addCriteria()">Добавить критерий</button>
-    </div>
-
     <div class="control-group imgPicker">
       <input type="file" id="fileUpload" @change="onFileChange" hidden/>
       <button class="input-file-btn" @click="chooseFiles()">Выберите картинку</button>
       <p v-if="file">Картинка загружена</p>
     </div>
 
-    <button class="btn-second" @click.prevent="AddCompetition(); reloadPage();">Создать конкурс</button>
+    <button class="btn-second" @click.prevent="EditCompetition()">Изменить конкурс</button>
   </div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
@@ -58,8 +48,8 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
-  name: "AddCompetition",
-  components: {AlertMessages, VueDatePicker },
+  name: "EditCompetition",
+  components: {AlertMessages, VueDatePicker},
   data() {
     return{
       selectedDate: null,
@@ -73,6 +63,7 @@ export default {
       datestart: '',
       dateend: '',
       image: '',
+      imageUrl: '',
       file: null,
       criterias: [{name: '', maxscore: ''}],
     }
@@ -83,16 +74,6 @@ export default {
   methods: {
     AddAlert(mess){
       this.$refs.AddAlertMess.AddAlertMess(mess);
-    },
-    deleteCriteria(key){
-      if(this.criterias.length > 1)
-        this.criterias.splice(key, 1);
-    },
-    addCriteria(){
-      if(this.criterias.length > 4)
-        this.AddAlert({ status: false, message: "Нельзя добавлять более 5 критериев" });
-      else
-        this.criterias.push({name: '', maxscore: ''});
     },
     CloseFunction(){
       this.ModView = !this.ModView;
@@ -112,19 +93,17 @@ export default {
     },
     CheckSession() {
       Concurs.Authentication()
-        .then(response => {
-          if (response && response.data.userId != 0) {
-            this.organizer_id = response.data.userId;
-          }
-          else {
-            this.organizer_id = 0;
-          }
-        });
+          .then(response => {
+            if (response && response.data.userId != 0) {
+              this.organizer_id = response.data.userId;
+            }
+            else {
+              this.organizer_id = 0;
+            }
+            this.GetOneCompetition();
+          });
     },
-    reloadPage() {
-      location.reload();
-    },
-    AddCompetition(){
+    EditCompetition(){
       if( this.organizer_id === 0) {
         this.AddAlert({ status: false, message: "Авторизуйтесь" });
         return;
@@ -133,42 +112,49 @@ export default {
         this.AddAlert({ status: false, message: "Дата начала позже даты конца" });
         return;
       }
-      let checkCriterias = this.criterias.every(criteria => {
-        return criteria.name !== "" && criteria.maxscore >= 1;
-      });
       if( this.name === ''      ||
           this.minitext === ''  ||
           this.fulltext === ''  ||
           this.datestart === '' ||
-          this.dateend === ''   ||
-          this.file === null    ||
-          checkCriterias === false) {
+          this.dateend === ''     ) {
         this.AddAlert({ status: false, message: "Заполните все поля" });
         return;
       }
       this.ModView = !this.ModView;
       let formData = new FormData();
-      formData.append("filedata", this.file);
+      if(this.file !== null) formData.append("filedata", this.file);
+      else formData.append("imageUrl", this.imageUrl);
       formData.append("userId", this.organizer_id);
       formData.append("name", this.name);
       formData.append("datestart", this.datestart);
       formData.append("dateend", this.dateend);
       formData.append("fulltext", this.fulltext);
       formData.append("minitext", this.minitext);
-      Concurs.createCompetition(formData).then((response) => {
+      formData.append("competitionId", this.$route.params.id);
+      formData.append("organizerId", this.organizer_id);
+      Concurs.updateCompetition(formData).then((response) => {
         console.log(response)
-        this.criterias.forEach((criteria) => {
-          Concurs.createCriteria({
-            competitionId: response.data.competitionId,
-            name: criteria.name,
-            maxscore: criteria.maxscore
-          })
-        })
+        this.reloadPage();
         if(response.statusText == "OK")
-          this.AddAlert({ status: true, message: "Успешное добавление" });
+          this.AddAlert({ status: true, message: "Успешное изменение" });
         else
-          this.AddAlert({ status: false, message: "Ошибка в добавлении" });
+          this.AddAlert({ status: false, message: "Ошибка в изменение" });
       });
+    },
+    GetOneCompetition() {
+      Concurs.getOneCompetition({id: this.$route.params.id})
+          .then((res) =>{
+            this.name = res.data.name;
+            this.minitext = res.data.minitext;
+            this.fulltext = res.data.fulltext;
+            this.criterias = res.data.criterias;
+            this.imageUrl =  res.data.image_path;
+            this.datestart = new Date(res.data.datestart);
+            this.dateend = new Date(res.data.dateend);
+          });
+    },
+    reloadPage() {
+      location.reload();
     }
   }
 }
@@ -227,11 +213,10 @@ export default {
 .AddCompetitionForm{
   position: fixed;
   top: 2vw;
-  left: 50%;
+  left: 20%;
   transform: translate(-50%, 0);
-  width: 50%;
+  width: 70%;
   min-width: 300px;
-  z-index: 3;
   padding: 10px;
   background: #fff;
   border: 1px solid #000;
@@ -301,23 +286,17 @@ textarea:focus {
 }
 
 .btn {
-  position: absolute;
-  z-index: 3;
+  margin-bottom: 10px;
   border: 2px solid transparent;
   background: #e0b5b5;
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
   padding: 0.5vw 1vw;
-  text-align: right;
-  text-decoration: none;
-  text-shadow: none;
-  box-shadow: none;
+  text-align: center;
   transition: 0.25s;
   display: block;
-  width: 20%;
-  left: calc((100vw - 1058px) / 2);
-  top: 20px;
+  width: 35%;
 }
 
 .btn-second{

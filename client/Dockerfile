@@ -1,23 +1,11 @@
-# base image
-FROM node:14.16.1-alpine3.13
-
-# set working directory
+FROM node:14-alpine
 WORKDIR /client
-
-# copy dependencies
 COPY package*.json ./
-
-# install dependencies
 RUN npm install
-
-# copy source files
 COPY . .
-
-# build for production with minification
 RUN npm run build
 
-
+FROM nginx:1.15.2-alpine
+COPY --from=build-stage /whois_client/dist /var/www
 EXPOSE 8080
-
-# start command
-CMD ["npm", "run", "serve"]
+ENTRYPOINT ["nginx","-g","daemon off;"]

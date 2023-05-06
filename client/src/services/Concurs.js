@@ -44,6 +44,14 @@ class Concurs {
       enctype: 'multipart/form-data'
     });
   }
+  updateCompetition(formData) {
+    return http.post('/competition/update', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      enctype: 'multipart/form-data'
+    });
+  }
   createCriteria(data) {
     return http.post(`/competition/createCriteria`, data, {
       headers: {
@@ -58,6 +66,13 @@ class Concurs {
       }
     });
   }
+  deleteJudge(data) {
+    return http.post(`/competition/deleteJudge`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   getCompetition(data) {
     return http.post(`/competition/getCompetition`, data, {
       headers: {
@@ -65,6 +80,21 @@ class Concurs {
       }
     });
   }
+  getOneCompetition(data) {
+    return http.post(`/competition/getOneCompetition`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  deleteCompetition(data) {
+    return http.post(`/competition/deleteCompetition`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+
   createModel(data) {
     return http.post(`/model/create`, data, {
       headers: {
@@ -86,6 +116,33 @@ class Concurs {
       }
     });
   }
-
+  isAdmin(data) {
+    return http.post(`/isAdmin`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  isJudge(data) {
+    return http.post(`/isJudge`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  isOrganizer(data) {
+    return http.post(`/isOrganizer`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  isParticipant(data) {
+    return http.post(`/isParticipant`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
 }
 export default new Concurs();
