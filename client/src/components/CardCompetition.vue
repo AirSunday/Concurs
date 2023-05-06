@@ -41,7 +41,7 @@ export default {
   },
   created(){
     // this.imageUrl = "http://localhost:8080/api/image/" + this.competition.image_path;
-    this.imageUrl = "http://45.131.41.167:8080/api/image/" + this.competition.image_path;
+    this.imageUrl = "https://whoisa.ru/api/image/" + this.competition.image_path;
   },
   methods: {
   }
