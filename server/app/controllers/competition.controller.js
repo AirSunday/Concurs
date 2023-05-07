@@ -58,6 +58,7 @@ exports.createCriteria = (req, res) => {
             name: req.body.name,
             maxscore: req.body.maxscore,
         }).then(data => {
+            console.log(data)
             competition.addCriteria(data).then(() => {
                 res.status(200).send({
                     message: "creat Criteria",
@@ -224,6 +225,7 @@ exports.getOneCompetition = async (req, res) => {
             judges: usersJudge,
             models: models
         };
+        console.log(criterias)
         res.status(200).send(response);
     } catch (err) {
         res.status(500).send({
