@@ -30,6 +30,7 @@ exports.create = (req, res) => {
     if(!filedata)
         res.send("Ошибка при загрузке файла");
     CreateOrganizer(req.body.userId, res).then((organizer) => {
+        console.log(organizer)
         Competition.create({
             organizer_id: organizer.id,
             name: req.body.name,
@@ -39,6 +40,7 @@ exports.create = (req, res) => {
             dateend: req.body.dateend,
             image: req.file.filename,
         }).then((competition) => {
+            console.log(competition)
             res.status(200).send({
                 message: "creat Competition",
                 competitionId: competition.id,

@@ -154,6 +154,8 @@ export default {
       formData.append("dateend", this.dateend);
       formData.append("fulltext", this.fulltext);
       formData.append("minitext", this.minitext);
+
+      console.log(this.criterias)
       Concurs.createCompetition(formData).then((response) => {
         console.log(response)
         console.log(this.criterias)
