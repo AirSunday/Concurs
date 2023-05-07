@@ -73,6 +73,13 @@ class Concurs {
       }
     });
   }
+  approvalJudge(data) {
+    return http.post(`/competition/approvalJudge`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   getCompetition(data) {
     return http.post(`/competition/getCompetition`, data, {
       headers: {
@@ -98,7 +105,7 @@ class Concurs {
   createModel(data) {
     return http.post(`/model/create`, data, {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'multipart/form-data'
       }
     });
   }

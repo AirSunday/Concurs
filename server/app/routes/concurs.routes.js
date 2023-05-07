@@ -26,6 +26,8 @@ module.exports = (app) => {
   //
   router.post("/competition/createJudge", competition.createJudge);
   //
+  router.post("/competition/approvalJudge", competition.approvalJudge);
+  //
   router.post("/competition/deleteJudge", competition.deleteJudge);
   //
   router.post("/competition/getCompetition", competition.getCompetition);

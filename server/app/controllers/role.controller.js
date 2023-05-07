@@ -74,7 +74,7 @@ exports.isParticipant = (req, res) => {
                 Promise.all(models.map((model) => {
                     return Participant.findOne({
                         where: {
-                            id: model.data.participant,
+                            id: model.dataValues.participant,
                             person_id: userId
                         }
                     });

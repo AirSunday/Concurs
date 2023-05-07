@@ -199,7 +199,7 @@ export default {
 <style scoped>
 .AuthFormTitle{
   position: absolute;
-  z-index: 3;
+  z-index: 1;
   border: 2px solid transparent;
   background: #e0b5b5;
   color: #ffffff;

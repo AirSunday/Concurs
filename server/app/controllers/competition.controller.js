@@ -119,6 +119,20 @@ exports.deleteJudge = (req, res) => {
     })
 }
 
+exports.approvalJudge = (req, res) => {
+    const judge_id = req.body.judge_id;
+    const approval = req.body.approval;
+    Judge.update({ approval: approval }, { where: { id: judge_id} })
+        .then(() => {
+            res.status(200).send("Changed Judge");
+        }).catch(err => {
+        res.status(500).send({
+            message: "Error changing Judge",
+            error: err
+        });
+    });
+}
+
 exports.getCompetition = (req, res) => {
     Competition.findAll().then((data) => {
         const promises = data.map(competition => {
@@ -189,8 +203,12 @@ exports.getOneCompetition = async (req, res) => {
         const organizer = await Organizer.findOne({ where: { id: competition.organizer_id } });
         const person = await Person.findOne({ where: { id: organizer.person_id } });
         const criterias = await Criteria.findAll({ where: { competitiondbId: competition.id } });
-        const judges = await Judge.findAll({ where: { competitiondbId: competition.id } });
         const models = await Model.findAll({ where: { competitiondbId: competition.id } });
+        const judges = await Judge.findAll({ where: { competitiondbId: competition.id } });
+        const usersJudge = await Promise.all(judges.map(async judge => {
+            const person = await Person.findOne({ where: { id: judge.person_id } });
+            return { id: person.id, name: person.name, approval: judge.approval, id_judge: judge.id };
+        }));
 
         const response = {
             id: competition.id,
@@ -203,7 +221,7 @@ exports.getOneCompetition = async (req, res) => {
             organizer_name: person.name,
             organizer_id: organizer.id,
             criterias: criterias,
-            judges: judges,
+            judges: usersJudge,
             models: models
         };
         res.status(200).send(response);

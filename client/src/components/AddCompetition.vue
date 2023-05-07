@@ -10,7 +10,7 @@
     </div>
 
     <div class="control-group">
-      <input type="text" class="login-field" v-model="name" placeholder="Название">
+      <input type="text" maxlength="50" class="login-field" v-model="name" placeholder="Название">
       <label class="login-field-icon fui-user"></label>
     </div>
     <div class="control-group">
@@ -45,7 +45,6 @@
       <button class="input-file-btn" @click="chooseFiles()">Выберите картинку</button>
       <p v-if="file">Картинка загружена</p>
     </div>
-
     <button class="btn-second" @click.prevent="AddCompetition(); reloadPage();">Создать конкурс</button>
   </div>
   <AlertMessages ref="AddAlertMess"/>
@@ -157,6 +156,7 @@ export default {
       formData.append("minitext", this.minitext);
       Concurs.createCompetition(formData).then((response) => {
         console.log(response)
+        console.log(this.criterias)
         this.criterias.forEach((criteria) => {
           Concurs.createCriteria({
             competitionId: response.data.competitionId,

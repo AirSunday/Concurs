@@ -2,7 +2,7 @@
   <AuthForm/>
   <div class="MainScreen">
     <div class="btnCopmetition" v-if="role === 'user'">
-      <button>Отправить модель</button>
+      <AddModel/>
       <button @click="SendRequestJudge">Стать судьей</button>
     </div>
     <div class="btnCopmetition" v-if="role === 'not approval judge' || role === 'approval judge'">
@@ -33,12 +33,36 @@
             <span>до {{criteria.maxscore}} баллов</span>
           </li>
         </ul>
+        <p style="margin-top: 10px">Спиок судей:</p>
+        <ul v-if="countApprovalJudge > 0 || (role === 'organizer' || role === 'admin')">
+          <li v-for="(jud,key) in judge" :key="key">
+            <div>
+              <span>{{ jud.name }}</span>
+              <span class="JudgeApproval JudgeHover"
+                    v-if="(role === 'organizer' || role === 'admin') && jud.approval"
+                    @click="JudgeApproval(false, key)">
+                Одобрено
+              </span>
+              <span class="JudgeNotApproval JudgeHover"
+                    v-if="(role === 'organizer' || role === 'admin') && !jud.approval"
+                    @click="JudgeApproval(true, key)">
+                Не одобрено
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul v-else><li><span>Судей нет</span></li></ul>
       </div>
     </div>
     <div class="menegerCompetitionBtn" v-if="role === 'organizer' || role === 'admin'">
       <EditCompetition/>
       <button @click="DeleteCompetition">Удалить Конкурс</button>
     </div>
+
+    <div class="ModelList" v-for="(mod, key) in model" :key="key">
+      <ModelCard :model="mod"/>
+    </div>
+
   </div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
@@ -48,10 +72,12 @@ import AuthForm from "@/components/AuthForm";
 import Concurs from "@/services/Concurs";
 import EditCompetition from "@/components/EditCompetition";
 import AlertMessages from "@/components/AlertMessages";
+import ModelCard from "@/components/ModelCard";
+import AddModel from "@/components/AddModel";
 
 export default {
   name: "CompetitionPage",
-  components: {AuthForm, EditCompetition, AlertMessages},
+  components: {AuthForm, EditCompetition, AlertMessages, ModelCard, AddModel},
   data() {
     return {
       name: '',
@@ -69,6 +95,8 @@ export default {
       day: 0,
       month: 0,
       role: 'user',
+      ShowJudgeList: false,
+      countApprovalJudge: 0,
     }
   },
   created() {
@@ -90,6 +118,7 @@ export default {
           this.organizer_id = res.data.organizer_id;
           this.organizer_name = res.data.organizer_name;
           this.judge = res.data.judges;
+          this.countApprovalJudge = this.judge.filter(judge => judge.approval).length;
           this.model = res.data.models;
 
           this.datestart = new Date();
@@ -178,6 +207,18 @@ export default {
     },
     reloadPage() {
       location.reload();
+    },
+    JudgeApproval(approval, key) {
+      Concurs.approvalJudge({
+        approval: approval,
+        judge_id: this.judge[key].id_judge,
+      }).then(() => {
+        this.GetOneCompetition();
+        this.AddAlert({ status: true, message: "Список судей изменен" });
+      }).catch(() => {
+
+        this.AddAlert({ status: false, message: "Ошибка в изменение списка судей" });
+      })
     }
   }
 }
@@ -196,6 +237,19 @@ export default {
   padding: 20px;
   width: min(100%, 1017px);
   background-color: #f6e8e8;
+}
+
+.JudgeApproval{
+  color: #92f16d;
+}
+
+.JudgeNotApproval{
+  color: #f16d6d;
+}
+
+.JudgeHover:hover{
+  opacity: 0.5;
+  cursor: pointer;
 }
 
 .Criterias{
