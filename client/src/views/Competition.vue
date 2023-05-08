@@ -150,6 +150,7 @@ export default {
                           else if(isJudge === 'approval')     this.role = 'approval judge';
                           else if(isJudge === 'not approval') this.role = 'not approval judge';
                           else                                this.role = 'user';
+                          console.log(this.role)
                         })
                     })
                 })
