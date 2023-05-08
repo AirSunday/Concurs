@@ -51,6 +51,7 @@ export default {
 <style scoped>
 .wrapper {
   display: grid;
+  border-radius: 20px;
   grid-template-columns: 5fr 5fr;
   width: 80%;
   height: 500px;
@@ -133,6 +134,7 @@ export default {
   position: absolute;
   right: 0;
   height: 100%;
+  border-radius: 0 20px 20px 0;
 }
 
 @media screen and (max-width: 500px) {

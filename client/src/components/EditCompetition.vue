@@ -123,7 +123,7 @@ export default {
       this.ModView = !this.ModView;
       let formData = new FormData();
       if(this.file !== null) formData.append("filedata", this.file);
-      else formData.append("imageUrl", this.imageUrl);
+      formData.append("imageUrl", this.imageUrl);
       formData.append("userId", this.organizer_id);
       formData.append("name", this.name);
       formData.append("datestart", this.datestart);
@@ -133,7 +133,6 @@ export default {
       formData.append("competitionId", this.$route.params.id);
       formData.append("organizerId", this.organizer_id);
       Concurs.updateCompetition(formData).then((response) => {
-        console.log(response)
         this.reloadPage();
         if(response.statusText == "OK")
           this.AddAlert({ status: true, message: "Успешное изменение" });
@@ -164,7 +163,8 @@ export default {
 
 .input-file-btn {
   border: 2px solid transparent;
-  background: #e0b5b5;
+  border-radius: 20px;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.4em + 1vw);
   line-height: 25px;
@@ -181,6 +181,7 @@ export default {
 }
 
 .cardCriteria input {
+  padding: 10px;
   width: 45%;
 }
 
@@ -195,6 +196,7 @@ export default {
 }
 
 .imgPicker img{
+  border-radius: 20px;
   width: 100px;
   height: 100px;
 }
@@ -220,7 +222,7 @@ export default {
   padding: 10px;
   background: #fff;
   border: 1px solid #000;
-  border-radius: 30px;
+  border-radius: 20px;
 }
 .title{
   display: flex;
@@ -252,28 +254,28 @@ export default {
 }
 
 input {
-  background-color: #ECF0F1;
+  background-color: var(--color-main);
+  border-radius: 20px;
   border: 2px solid transparent;
-  border-radius: 3px;
   font-size: 16px;
   font-weight: 200;
-  padding: 10px 0;
+  padding: 10px;
   width: 100%;
   transition: border .5s;
 }
 
 input:focus {
-  border: 2px solid #debcbc;
+  border: 2px solid var(--color-main);
   box-shadow: none;
 }
 
 textarea{
   background-color: #ECF0F1;
   border: 2px solid transparent;
-  border-radius: 3px;
+  border-radius: 30px;
   font-size: 16px;
   font-weight: 200;
-  padding: 10px 0;
+  padding: 10px;
   width: 100%;
   height: 80%;
   resize: none;
@@ -281,14 +283,15 @@ textarea{
 }
 
 textarea:focus {
-  border: 2px solid #debcbc;
+  border: 2px solid var(--color-main);
   box-shadow: none;
 }
 
 .btn {
   margin-bottom: 10px;
+  border-radius: 20px;
   border: 2px solid transparent;
-  background: #e0b5b5;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
@@ -301,7 +304,8 @@ textarea:focus {
 
 .btn-second{
   border: 2px solid transparent;
-  background: #e0b5b5;
+  border-radius: 20px;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
@@ -316,11 +320,11 @@ textarea:focus {
 }
 
 .btn:hover {
-  background-color: #e7cbcb;
+  opacity: 0.7;
 }
 
 .btn-second:hover {
-  background-color: #e7cbcb;
+  opacity: 0.7;
 }
 
 @media screen and (max-width: 1000px) {

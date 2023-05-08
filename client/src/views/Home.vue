@@ -61,7 +61,7 @@ export default {
   align-items: center;
   padding: 20px;
   width: min(100%, 1000px);
-  background-color: #f6e8e8;
+  background-color: var(--color-back-second);
 }
 
 .spaceEmpty {

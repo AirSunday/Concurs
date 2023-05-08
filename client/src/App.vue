@@ -19,11 +19,18 @@ export default {
 
 <style>
 
+:root {
+  --color-back: #00ffc2;
+  --color-main: #a3d3c8;
+  --color-second: #fff;
+  --color-back-second: #e8f6f3;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
-  background-color:rgb(250, 28, 65);
+  background-color: var(--color-back);
 }
 
 #app {

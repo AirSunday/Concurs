@@ -1,5 +1,6 @@
 const db = require("../models").db;
 var sequelize = require("sequelize");
+const fs = require("fs");
 const Model = db.modeldbs;
 const Participant = db.participantdbs;
 const Competition = db.competitiondbs;
@@ -79,4 +80,35 @@ exports.create = (req, res) => {
     });
 };
 
+exports.update = async (req, res) => {
+    const filedata = req.file;
+    const modelId = req.body.modelId;
+    if(filedata) {
+        await fs.unlink("app/uploads/" + req.body.imageUrl, (err) => {
+            if (err) {
+                console.error(err);
+            }
+        });
+    }
 
+    let filename = '';
+    if(!filedata) filename = req.body.imageUrl;
+    else filename = req.file.filename;
+    Model.update({
+        name: req.body.name,
+        view: req.body.view,
+        text: req.body.text,
+        scale: req.body.scale,
+        image: filename,
+    }, {
+        where: {
+            id: modelId,
+        }
+    }).then(() => {
+        res.status(200).send("update competition");
+    }).catch((err) => {
+        res.status(500).send({
+            message: "Error updating competition",
+        });
+    })
+};

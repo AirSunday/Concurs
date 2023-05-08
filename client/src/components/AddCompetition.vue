@@ -45,7 +45,7 @@
       <button class="input-file-btn" @click="chooseFiles()">Выберите картинку</button>
       <p v-if="file">Картинка загружена</p>
     </div>
-    <button class="btn-second" @click.prevent="AddCompetition(); reloadPage();">Создать конкурс</button>
+    <button class="btn-second" @click.prevent="AddCompetition();">Создать конкурс</button>
   </div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
@@ -159,6 +159,7 @@ export default {
       Concurs.createCompetition(formData).then((response) => {
         console.log(response)
         console.log(this.criterias)
+        // this.reloadPage();
         this.criterias.forEach((criteria) => {
           Concurs.createCriteria({
             competitionId: response.data.competitionId,
@@ -180,14 +181,15 @@ export default {
 
 .input-file-btn {
   border: 2px solid transparent;
-  background: #e0b5b5;
+  border-radius: 20px;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.4em + 1vw);
   line-height: 25px;
   padding: 0.5vw 1vw;
   text-align: left;
   transition: 0.25s;
-  width: 80%;
+  width: 60%;
 }
 
 .cardCriteria{
@@ -197,6 +199,8 @@ export default {
 }
 
 .cardCriteria input {
+  border-radius: 20px;
+  padding: 10px;
   width: 45%;
 }
 
@@ -217,7 +221,7 @@ export default {
 
 .DatePicker {
   border: 2px solid transparent;
-  border-radius: 3px;
+  border-radius: 20px;
   font-size: 16px;
   font-weight: 200;
   padding: 10px 0;
@@ -237,7 +241,7 @@ export default {
   padding: 10px;
   background: #fff;
   border: 1px solid #000;
-  border-radius: 30px;
+  border-radius: 20px;
 }
 .title{
   display: flex;
@@ -270,8 +274,9 @@ export default {
 
 input {
   background-color: #ECF0F1;
+  border-radius: 20px;
+  padding: 10px;
   border: 2px solid transparent;
-  border-radius: 3px;
   font-size: 16px;
   font-weight: 200;
   padding: 10px 0;
@@ -280,17 +285,17 @@ input {
 }
 
 input:focus {
-  border: 2px solid #debcbc;
+  border: 2px solid var(--color-main);
   box-shadow: none;
 }
 
 textarea{
   background-color: #ECF0F1;
+  border-radius: 20px;
+  padding: 10px;
   border: 2px solid transparent;
-  border-radius: 3px;
   font-size: 16px;
   font-weight: 200;
-  padding: 10px 0;
   width: 100%;
   height: 80%;
   resize: none;
@@ -298,15 +303,16 @@ textarea{
 }
 
 textarea:focus {
-  border: 2px solid #debcbc;
+  border: 2px solid var(--color-main);
   box-shadow: none;
 }
 
 .btn {
   position: absolute;
   z-index: 3;
+  border-radius: 20px;
   border: 2px solid transparent;
-  background: #e0b5b5;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
@@ -318,13 +324,14 @@ textarea:focus {
   transition: 0.25s;
   display: block;
   width: 20%;
-  left: calc((100vw - 1058px) / 2);
+  left: calc((100vw - 1000px) / 2);
   top: 20px;
 }
 
 .btn-second{
   border: 2px solid transparent;
-  background: #e0b5b5;
+  border-radius: 20px;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
@@ -339,11 +346,11 @@ textarea:focus {
 }
 
 .btn:hover {
-  background-color: #e7cbcb;
+  opacity: 0.7;
 }
 
 .btn-second:hover {
-  background-color: #e7cbcb;
+  opacity: 0.7;
 }
 
 @media screen and (max-width: 1000px) {

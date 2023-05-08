@@ -1,10 +1,10 @@
 <template>
-  <button class="btn" @click="ModView = !ModView">Отправить модель</button>
+  <button class="btn" @click="ModView = !ModView">Изменить модель</button>
   <div v-if="!ModView"  class="AddCompetitionForm">
 
     <div class="title">
       <div class="app-title">
-        <h1>Форма добавления модели</h1>
+        <h1>Форма изменения модели</h1>
       </div>
       <h1 class="close" @click="CloseFunction">&#10006;</h1>
     </div>
@@ -27,7 +27,8 @@
       <button class="input-file-btn" @click="chooseFiles()">Выберите картинку</button>
       <p v-if="file">Картинка загружена</p>
     </div>
-    <button class="btn-second" @click.prevent="AddCompetition(); reloadPage();">Отправить модель</button>
+
+    <button class="btn-second" @click.prevent="EditModel()">Изменить модель</button>
   </div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
@@ -37,21 +38,34 @@ import Concurs from "@/services/Concurs";
 import AlertMessages from '@/components/AlertMessages.vue';
 
 export default {
-  name: "AddModel",
+  name: "EditModel",
   components: {AlertMessages},
   data() {
     return{
       ModView: true,
+      modelId: '',
       name: '',
-      view: '',
-      scale: '',
+      view:'',
       text: '',
+      scale: '',
       image: '',
+      imageUrl: '',
       file: null,
     }
   },
+  props: {
+    model: {
+      type: Object,
+      required: true
+    },
+  },
   created() {
-    this.CheckSession();
+    this.modelId = this.model.id;
+    this.name = this.model.name;
+    this.view = this.model.view;
+    this.text = this.model.text;
+    this.scale = this.model.scale;
+    this.imageUrl = this.model.image;
   },
   methods: {
     AddAlert(mess){
@@ -59,13 +73,13 @@ export default {
     },
     CloseFunction(){
       this.ModView = !this.ModView;
+      this.modelId = '';
       this.name = '';
-      this.minitext = '';
-      this.fulltext = '';
-      this.datestart = '';
-      this.dateend = '';
+      this.view = '';
+      this.text = '';
+      this.scale = '';
+      this.image = '';
       this.file = null;
-      this.criterias =  [{name: '', maxscore: ''}];
     },
     chooseFiles: function() {
       document.getElementById("fileUpload").click()
@@ -73,48 +87,34 @@ export default {
     onFileChange(e) {
       this.file = e.target.files[0];
     },
-    CheckSession() {
-      Concurs.Authentication()
-          .then(response => {
-            if (response && response.data.userId != 0) {
-              this.organizer_id = response.data.userId;
-            }
-            else {
-              this.organizer_id = 0;
-            }
-          });
-    },
-    reloadPage() {
-      location.reload();
-    },
-    AddCompetition(){
-      if( this.organizer_id === 0) {
-        this.AddAlert({ status: false, message: "Авторизуйтесь" });
-        return;
-      }
-      if( this.name === ''    ||
-          this.view === ''    ||
-          this.scale === ''   ||
-          this.text === ''    ||
-          this.file === null  ) {
+    EditModel(){
+      if( this.name === ''  ||
+          this.view === ''  ||
+          this.text === ''  ||
+          this.scale === '' ) {
         this.AddAlert({ status: false, message: "Заполните все поля" });
         return;
       }
       this.ModView = !this.ModView;
       let formData = new FormData();
-      formData.append("filedata", this.file);
+      if(this.file !== null) formData.append("filedata", this.file);
+      formData.append("imageUrl", this.imageUrl);
+      formData.append("modelId", this.modelId);
       formData.append("name", this.name);
       formData.append("view", this.view);
-      formData.append("scale", this.scale);
       formData.append("text", this.text);
-      formData.append("competitionId", this.$route.params.id);
-      Concurs.createModel(formData).then((response) => {
+      formData.append("scale", this.scale);
+      Concurs.updateModel(formData).then((response) => {
         console.log(response)
+        this.reloadPage();
         if(response.statusText == "OK")
-          this.AddAlert({ status: true, message: "Успешное добавление" });
+          this.AddAlert({ status: true, message: "Успешное изменение" });
         else
-          this.AddAlert({ status: false, message: "Ошибка в добавлении" });
+          this.AddAlert({ status: false, message: "Ошибка в изменение" });
       });
+    },
+    reloadPage() {
+      location.reload();
     }
   }
 }
@@ -123,8 +123,8 @@ export default {
 <style scoped>
 
 .input-file-btn {
-  border-radius: 20px;
   border: 2px solid transparent;
+  border-radius: 20px;
   background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.4em + 1vw);
@@ -135,26 +135,18 @@ export default {
   width: 80%;
 }
 
-.cardCriteria input {
-  padding: 10px;
-  border-radius: 20px;
-  width: 45%;
-}
-
 .imgPicker img{
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px;
   width: 100px;
   height: 100px;
 }
 
 .AddCompetitionForm{
   position: fixed;
-  top: 8vw;
-  left: 50%;
-  transform: translate(-50%, 0);
-  width: 50%;
+  top: 10vw;
+  left: 20%;
+  width: 70%;
   min-width: 300px;
-  z-index: 3;
   padding: 10px;
   background: #fff;
   border: 1px solid #000;
@@ -185,9 +177,13 @@ export default {
   margin-bottom: 10px;
 }
 
+.control-group2 {
+  margin: 0;
+}
+
 input {
-  border-radius: 20px;
   background-color: #ECF0F1;
+  border-radius: 20px;
   border: 2px solid transparent;
   font-size: 16px;
   font-weight: 200;
@@ -201,15 +197,15 @@ input:focus {
   box-shadow: none;
 }
 
-.textareaModel{
+textarea{
   background-color: #ECF0F1;
   border: 2px solid transparent;
-  border-radius: 20px;
+  border-radius: 30px;
   font-size: 16px;
   font-weight: 200;
   padding: 10px;
   width: 100%;
-  height: 20%;
+  height: 80%;
   resize: none;
   transition: border .5s;
 }
@@ -220,37 +216,23 @@ textarea:focus {
 }
 
 .btn {
-  margin-bottom: 10px;
-  margin-left: 3vw;
+  margin: 10px 10vw 20px 10vw;
   border-radius: 20px;
   border: 2px solid transparent;
   background: var(--color-main);
   color: #ffffff;
-  font-size: calc(0.5em + 1vw);
+  font-size: min(calc(0.5em + 1vw), 15px);
   line-height: 25px;
   padding: 0.5vw 1vw;
-  text-align: right;
-  text-decoration: none;
-  text-shadow: none;
-  box-shadow: none;
+  text-align: center;
   transition: 0.25s;
   display: block;
-  width: 50%;
-}
-
-.btn:hover {
-  opacity: 0.7;
-}
-
-@media screen and (max-width: 1000px) {
-  .btn {
-    width: 70%;
-  }
+  width: 30%;
 }
 
 .btn-second{
-  border-radius: 20px;
   border: 2px solid transparent;
+  border-radius: 20px;
   background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
@@ -265,8 +247,18 @@ textarea:focus {
   width: 50%;
 }
 
+.btn:hover {
+  opacity: 0.7;
+}
+
 .btn-second:hover {
   opacity: 0.7;
 }
 
+@media screen and (max-width: 1000px) {
+  .btn{
+    left: 0;
+    width: 30%;
+  }
+}
 </style>

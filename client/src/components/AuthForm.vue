@@ -201,7 +201,8 @@ export default {
   position: absolute;
   z-index: 1;
   border: 2px solid transparent;
-  background: #e0b5b5;
+  border-radius: 20px;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
@@ -213,13 +214,13 @@ export default {
   transition: 0.25s;
   display: block;
   width: 20%;
-  right: calc((100vw - 1076px) / 2);
+  right: calc((100vw - 1000px) / 2);
   top: 20px;
   margin: 0;
 }
 
 .AuthFormTitle:hover {
-  background-color: #e7cbcb;
+  opacity: 0.7;
 }
 
 .AuthFormMain{
@@ -232,7 +233,7 @@ export default {
   max-width: 500px;
   z-index: 4;
   padding: 10px;
-  background: #e1cfcf;
+  background: var(--color-second);
   border-radius: 30px;
 }
 
@@ -280,22 +281,23 @@ input {
   text-align: center;
   background-color: #ECF0F1;
   border: 2px solid transparent;
-  border-radius: 3px;
+  border-radius: 20px;
   font-size: 16px;
   font-weight: 200;
-  padding: 10px 0;
+  padding: 10px;
   width: 80%;
   transition: border .5s;
 }
 
 input:focus {
-  border: 2px solid #e0b5b5;
+  border: 2px solid var(--color-main);
   box-shadow: none;
 }
 
 .btn {
+  border-radius: 20px;
   border: 2px solid transparent;
-  background: #e0b5b5;
+  background: var(--color-main);
   color: #ffffff;
   font-size: 16px;
   line-height: 25px;
@@ -310,7 +312,7 @@ input:focus {
 }
 
 .btn:hover {
-  background-color: #e0b5b5;
+  opacity: 0.7;
 }
 
 .app-down{

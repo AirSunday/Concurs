@@ -60,7 +60,7 @@
     </div>
 
     <div class="ModelList" v-for="(mod, key) in model" :key="key">
-      <ModelCard :model="mod"/>
+      <ModelCard :model="mod" :role="role"/>
     </div>
 
   </div>
@@ -236,7 +236,7 @@ export default {
   align-items: center;
   padding: 20px;
   width: min(100%, 1017px);
-  background-color: #f6e8e8;
+  background-color: var(--color-back-second);
 }
 
 .JudgeApproval{
@@ -284,7 +284,8 @@ export default {
 .menegerCompetitionBtn button{
   margin-bottom: 10px;
   border: 2px solid transparent;
-  background: #e0b5b5;
+  border-radius: 20px;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
@@ -296,7 +297,7 @@ export default {
 }
 
 .menegerCompetitionBtn button:hover {
-  background-color: #e7cbcb;
+  opacity: 0.7;
 }
 
 .btnCopmetition {
@@ -307,8 +308,10 @@ export default {
 
 .btnCopmetition button {
   margin-bottom: 10px;
+  margin-left: 3vw;
   border: 2px solid transparent;
-  background: #e0b5b5;
+  border-radius: 20px;
+  background: var(--color-main);
   color: #ffffff;
   font-size: calc(0.5em + 1vw);
   line-height: 25px;
@@ -325,7 +328,7 @@ export default {
 }
 
 .btnCopmetition button:hover {
-  background-color: #e7cbcb;
+  opacity: 0.7;
 }
 
 @media screen and (max-width: 1000px) {
@@ -346,7 +349,7 @@ export default {
 }
 
 .rightContentDown p {
-  margin: 2px;
+  margin: 5px;
   text-align: right;
   opacity: 0.6;
 }
@@ -362,6 +365,7 @@ export default {
 
 .CardTitle{
   display: grid;
+  border-radius: 20px;
   grid-template-columns: 5fr 5fr;
   width: 100%;
   height: 100%;
@@ -371,6 +375,7 @@ export default {
 
 .fullText{
   text-align: justify;
+  border-radius: 20px;
   width: 100%;
   margin: 10px;
   background: #fff;
@@ -383,6 +388,7 @@ export default {
 }
 
 .right {
+  border-radius: 20px 0 0 20px;
   position: relative;
   overflow: hidden;
   clip-path: polygon(0 0, 80% 0%, 100% 100%, 0% 100%);
@@ -392,6 +398,7 @@ export default {
 }
 
 .right img {
+  border-radius: 20px 0 0 20px;
   height: 400px;
 }
 

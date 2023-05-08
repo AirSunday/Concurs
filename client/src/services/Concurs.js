@@ -52,6 +52,14 @@ class Concurs {
       enctype: 'multipart/form-data'
     });
   }
+  updateModel(formData) {
+    return http.post('/model/update', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      enctype: 'multipart/form-data'
+    });
+  }
   createCriteria(data) {
     return http.post(`/competition/createCriteria`, data, {
       headers: {
@@ -96,6 +104,13 @@ class Concurs {
   }
   deleteCompetition(data) {
     return http.post(`/competition/deleteCompetition`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  deleteModel(data) {
+    return http.post(`/competition/deleteModel`, data, {
       headers: {
         'Content-Type': 'application/json'
       }

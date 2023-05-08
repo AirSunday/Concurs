@@ -36,7 +36,11 @@ module.exports = (app) => {
   //
   router.post("/competition/deleteCompetition", competition.deleteCompetition);
   //
+  router.post("/competition/deleteModel", competition.deleteModel);
+  //
   router.post("/model/create", model.create);
+  //
+  router.post("/model/update", model.update);
   //
   router.get("/image/:filename", competition.sendImage);
   //

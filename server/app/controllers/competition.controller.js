@@ -7,6 +7,7 @@ const Model = db.modeldbs;
 const Organizer = db.organizerdbs;
 const Competition = db.competitiondbs;
 const Participant = db.participantdbs;
+const Score = db.scoredbs;
 const Op = db.Sequelize.Op;
 
 Competition.hasMany(Judge, {as: 'judge'});
@@ -205,12 +206,23 @@ exports.getOneCompetition = async (req, res) => {
         const competition = await Competition.findOne({ where: { id: req.body.id } });
         const organizer = await Organizer.findOne({ where: { id: competition.organizer_id } });
         const person = await Person.findOne({ where: { id: organizer.person_id } });
+
         const criterias = await Criteria.findAll({ where: { competitiondbId: competition.id } });
-        const models = await Model.findAll({ where: { competitiondbId: competition.id } });
         const judges = await Judge.findAll({ where: { competitiondbId: competition.id } });
         const usersJudge = await Promise.all(judges.map(async judge => {
             const person = await Person.findOne({ where: { id: judge.person_id } });
             return { id: person.id, name: person.name, approval: judge.approval, id_judge: judge.id };
+        }));
+
+        const models = await Model.findAll({ where: { competitiondbId: competition.id } });
+        const usersModels = await Promise.all(models.map(async model => {
+            const participant = await Participant.findOne({ where: { id: model.participant }});
+            const person = await Person.findOne({ where: { id: participant.person_id } });
+            return { id: model.id, person_name: person.name,
+                     person_id: person.id, name: model.name, view: model.view,
+                     scale: model.scale, text: model.text, image: model.image,
+                     participant: model.participant, score: model.score,
+                     dateupload: model.dateupload, competitiondbId: model.competitiondbId};
         }));
 
         const response = {
@@ -225,7 +237,7 @@ exports.getOneCompetition = async (req, res) => {
             organizer_id: organizer.id,
             criterias: criterias,
             judges: usersJudge,
-            models: models
+            models: usersModels
         };
         console.log(criterias)
         res.status(200).send(response);
@@ -264,6 +276,25 @@ exports.deleteCompetition = async (req, res) => {
         res.status(500).send(error);
     }
 };
+
+exports.deleteModel = async (req, res) => {
+    const modelId = req.body.modelId;
+    const participantId = req.body.participantId;
+    try {
+        await Score.destroy({where: { model_id: modelId }});
+        await Participant.destroy({where: { id: participantId}});
+        await Model.destroy({where: { id: modelId }});
+        await fs.unlink("app/uploads/" + req.body.image, (err) => {
+            if (err) {
+                console.error(err);
+            }
+        });
+
+        res.status(200).send('Competition successfully deleted');
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}
 
 exports.update = async (req, res) => {
     const filedata = req.file;
