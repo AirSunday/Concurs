@@ -214,7 +214,9 @@ exports.getOneCompetition = async (req, res) => {
             return { id: person.id, name: person.name, approval: judge.approval, id_judge: judge.id };
         }));
 
-        const models = await Model.findAll({ where: { competitiondbId: competition.id } });
+        const models = await Model.findAll(
+            {order: [["count", "DESC"]]},
+            { where: { competitiondbId: competition.id } });
         const usersModels = await Promise.all(models.map(async model => {
             const participant = await Participant.findOne({ where: { id: model.participant }});
             const person = await Person.findOne({ where: { id: participant.person_id } });

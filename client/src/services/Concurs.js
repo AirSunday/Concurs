@@ -67,6 +67,20 @@ class Concurs {
       }
     });
   }
+  sendScore(data) {
+    return http.post(`/model/sendScore`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  getScore(data) {
+    return http.post(`/model/getScore`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   createJudge(data) {
     return http.post(`/competition/createJudge`, data, {
       headers: {

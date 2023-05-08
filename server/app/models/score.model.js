@@ -16,6 +16,9 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.INTEGER,
             },
             score: {
+                type: Sequelize.FLOAT,
+            },
+            maxscore: {
                 type: Sequelize.INTEGER,
             },
         },

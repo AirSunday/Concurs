@@ -25,7 +25,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
         },
         score: {
-            type: Sequelize.INTEGER,
+            type: Sequelize.FLOAT,
         },
         dateupload: {
             type: Sequelize.DATE,

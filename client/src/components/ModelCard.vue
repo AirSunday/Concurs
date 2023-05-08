@@ -1,34 +1,61 @@
 <template>
-  <div class="CardModel">
-    <div class="right">
-      <img :src="imagePath" alt="">
+  <div class="CardModelMain">
+    <div class="Rang" v-if="rang < 4">
+      <img :src="require(`@/components/images/${rang}.png`)"/>
     </div>
-    <div class="rightContent">
-      <p class="TitleCompetition">{{name}}</p>
-      <p class="content">{{text}}</p>
-      <div class="rightContentDown">
-        <p>{{userName}}: Имя участника</p>
-        <p>{{view}}: Вид модели</p>
-        <p>{{scale}}: Масштаб</p>
-        <p>{{score}}: Оценка</p>
-        <p>{{dateupload.split('T')[0]}}: Дата загрузки</p>
-        <p></p>
+    <div class="CardModel">
+      <div class="right">
+        <img :src="imagePath" alt="">
+      </div>
+      <div class="rightContent">
+        <p class="TitleCompetition">{{name}}</p>
+        <p class="content">{{text}}</p>
+        <div class="rightContentDown">
+          <p>{{userName}}: Имя участника</p>
+          <p>{{view}}: Вид модели</p>
+          <p>{{scale}}: Масштаб</p>
+          <p>{{score}}%: Оценка</p>
+          <p>{{dateupload.split('T')[0]}}: Дата загрузки</p>
+          <p></p>
+        </div>
+      </div>
+    </div>
+    <div class="manegeModel" v-if="personId === personIdNow || role === 'organizer' || role === 'admin'">
+      <button @click="DeleteModel">Удалить Модель</button>
+      <EditModel :model="model"/>
+    </div>
+
+    <div class="rated" v-bind:class="{ ratedFalse: !rated, ratedTrue: rated}">
+      <p v-if="rated">Оценено</p>
+      <p v-else>Не оценено</p>
+    </div>
+
+    <div class="criteriaModel" v-if="role === 'approval judge'">
+      <div>
+        <div class="criteria" v-for="(score, key) in scores" :key="key">
+          <p>{{score.name}}: </p>
+          <div class="criteriaScore">
+            <input type="number" v-model="score.score" :min="0" :max="score.maxscore" placeholder="Максимальная оценка"/>
+            <p> / {{score.maxscore}}</p>
+          </div>
+        </div>
+      </div>
+      <div class="btnSend">
+        <button @click="SendScore">Оценить</button>
       </div>
     </div>
   </div>
-  <div class="mangingModel" v-if="personId === personIdNow || role === 'organizer' || role === 'admin'">
-    <button @click="DeleteModel">Удалить Модель</button>
-    <EditModel :model="model"/>
-  </div>
+  <AlertMessages ref="AddAlertMess"/>
 </template>
 
 <script>
 import Concurs from "@/services/Concurs";
 import EditModel from "@/components/EditModel";
+import AlertMessages from "@/components/AlertMessages"
 
 export default {
   name: "ModelCard",
-  components: {EditModel},
+  components: {EditModel, AlertMessages},
   data() {
     return {
       userName: '',
@@ -42,6 +69,8 @@ export default {
       dateupload: '',
       personId: '',
       personIdNow: '',
+      scores: [],
+      rated: true
     }
   },
   props: {
@@ -51,6 +80,13 @@ export default {
     },
     role: {
       type: String
+    },
+    criterias: {
+      type: Object,
+      required: true
+    },
+    rang: {
+      type: Number,
     }
   },
   created() {
@@ -70,6 +106,30 @@ export default {
       this.participant = this.model.participant;
       this.userName = this.model.person_name;
       this.personId = this.model.person_id;
+
+      this.criterias.forEach(criteria => {
+        this.scores.push({
+          id: criteria.id,
+          name: criteria.name,
+          score: 0,
+          maxscore: criteria.maxscore
+        })
+      })
+
+      Concurs.getScore({
+        competitionId: this.$route.params.id,
+        modelId: this.model.id
+      })
+          .then(res => {
+            if(res.data.length === 0) this.rated = false;
+            res.data.forEach(nowScore => {
+              const score = this.scores.find(score => score.id === nowScore.criteria_id);
+              if (score) {
+                score.score = nowScore.score;
+              }
+              else this.rated = false;
+            });
+          });
     },
     CheckSession() {
       Concurs.Authentication()
@@ -82,6 +142,9 @@ export default {
             }
           });
     },
+    AddAlert(mess){
+      this.$refs.AddAlertMess.AddAlertMess(mess);
+    },
     reloadPage() {
       location.reload();
     },
@@ -91,22 +154,131 @@ export default {
         participantId: this.model.participant,
         image: this.model.image,
       }).then(() => {
-        // this.reloadPage();
+        this.reloadPage();
       })
     },
+    SendScore(){
+      this.scores.forEach(score => {
+        if(score.score > score.maxscore) score.score = score.maxscore;
+        Concurs.sendScore({
+          criteriaId: score.id,
+          score: score.score,
+          maxScore: score.maxscore,
+          competitionId: this.$route.params.id,
+          modelId: this.model.id })
+            .then((res) => {
+              location.reload();
+              if(res.statusText == "OK")
+                this.AddAlert({ status: true, message: "Оценено " + score.name });
+              else
+                this.AddAlert({ status: false, message: "Ошибка в оценке " + score.name });
+            })
+      })
+    }
   }
 }
 </script>
 
 <style scoped>
 
-.mangingModel{
+.rated {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  border-radius: 0 0 20px 20px;
+  background: #fff;
+  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
+  margin-bottom: -20px;
+  width: 100%;
+  height: 5vh;
+  transform: translate(0, -50%);
+}
+
+.rated p{
+  position: absolute;
+  bottom: 0;
+  margin: 0;
+  right: 50%;
+  transform: translate(50%, 0);
+  font-size: min(calc(0.5em + 1vw), 18px);
+}
+
+.ratedTrue{
+  background: #b0ecae;
+}
+
+.ratedFalse{
+  background: #ecaeae;
+}
+
+.btnSend{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.btnSend button{
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background: var(--color-main);
+  color: #ffffff;
+  font-size: calc(0.5em + 1vw);
+  line-height: 25px;
+  padding: 0.5vw 1vw;
+  margin: 1vw 1vw;
+  text-align: right;
+  transition: 0.25s;
+  display: block;
+}
+
+.btnSend button:hover {
+  opacity: 0.7;
+}
+
+.criteriaModel{
+  position: relative;
+  display: grid;
+  grid-template-columns: 5fr 5fr;
+}
+
+.criteria {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.criteria p{
+  font-size: min(calc(0.4em + 1vw), 20px);
+}
+
+.criteriaScore{
+  display: flex;
+}
+
+.criteria input {
+  text-align: right;
+  font-size: min(calc(0.4em + 1vw), 20px);
+  background-color: #ECF0F1;
+  margin-left: 10px;
+  border: 2px solid transparent;
+  font-weight: 200;
+  padding: 0 10px;
+  transition: border .5s;
+}
+
+.criteria input:focus {
+  border: 2px solid var(--color-main);
+  box-shadow: none;
+}
+
+.manegeModel{
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
-.mangingModel button{
+.manegeModel button{
   margin: 10px 10vw 20px 10vw;
   border: 2px solid transparent;
   border-radius: 20px;
@@ -118,10 +290,10 @@ export default {
   text-align: center;
   transition: 0.25s;
   display: block;
-  width: 30%;
+  width: 35%;
 }
 
-.mangingModel button:hover {
+.manegeModel button:hover {
   opacity: 0.7;
 }
 
@@ -146,6 +318,7 @@ export default {
   font-size: min(calc(0.4em + 1vw), 17px);
   text-align: justify;
   color: #404040;
+  padding-right: 20px;
 }
 
 .rightContent {
@@ -181,11 +354,38 @@ export default {
 }
 
 .CardModel{
+  position: relative;
   display: grid;
   grid-template-columns: 4fr 6fr;
+  z-index: 3;
   border-radius: 20px;
   background: #fff;
   box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
   margin-top: 10px;
+}
+
+.CardModelMain{
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
+  margin-top: 10px;
+}
+
+.Rang {
+  position: absolute;
+  z-index: 4;
+  margin: 10px;
+}
+
+.Rang img{
+  height: auto;
+  width: min(10vw, 100px);
+}
+
+@media screen and (max-width: 500px) {
+  .Rang img{
+    height: auto;
+    width: 20vw;
+  }
 }
 </style>

@@ -4,6 +4,8 @@ const fs = require("fs");
 const Model = db.modeldbs;
 const Participant = db.participantdbs;
 const Competition = db.competitiondbs;
+const Score = db.scoredbs;
+const Judge = db.judgedbs;
 const Op = db.Sequelize.Op;
 const Sessiondb = db.sessiondbs;
 
@@ -112,3 +114,86 @@ exports.update = async (req, res) => {
         });
     })
 };
+
+exports.sendScore = async (req, res) => {
+    const criteriaId = req.body.criteriaId;
+    const competitionId = req.body.competitionId;
+    const modelId = req.body.modelId;
+    const maxScore = req.body.maxScore;
+    const score = req.body.score;
+
+    const personId = await FindSession(req)
+
+    const judge = await Judge.findOne({where: {
+        person_id: personId,
+        competitiondbId: competitionId,
+    }})
+
+    const findScore = await Score.findOne({where: {
+            model_id: modelId,
+            criteria_id: criteriaId,
+            judge_id: judge.id,
+        }})
+
+    if(findScore){
+        await Score.update( {score: score},  {where: {
+                id: findScore.dataValues.id
+            }})
+    }
+    else {
+        await Score.create({
+            model_id: modelId,
+            criteria_id: criteriaId,
+            judge_id: judge.id,
+            score: score,
+            maxscore: maxScore,
+        })
+    }
+
+    const nowScore = await Score.findAll({where: {model_id: modelId}});
+
+    let mathScore = 0;
+    await nowScore.forEach(score => mathScore += parseFloat((100 * score.score / score.maxscore).toFixed(2)));
+
+    mathScore = parseFloat((mathScore / nowScore.length).toFixed(2));
+
+    await Model.update({
+        score: mathScore,
+    }, { where: {id: modelId}})
+    .then(() => {
+        res.status(200).send("Add score");
+    }).catch((err) => {
+        res.status(500).send({
+            message: "Error adiing score",
+        });
+    })
+}
+
+exports.getScore = async (req, res) => {
+    try {
+        const modelId = req.body.modelId;
+        const competitionId = req.body.competitionId;
+
+        const personId = await FindSession(req);
+
+        const judge = await Judge.findOne({
+            where: {
+                person_id: personId,
+                competitiondbId: competitionId,
+            }
+        })
+        let criterias = [];
+        if(judge)
+            criterias = await Score.findAll({
+                where: {
+                    model_id: modelId,
+                    judge_id: judge.id,
+                }
+            })
+
+        res.status(200).send(criterias);
+    }
+    catch{
+        res.status(500).send("Error in geting score");
+    }
+}

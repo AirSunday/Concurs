@@ -60,7 +60,7 @@
     </div>
 
     <div class="ModelList" v-for="(mod, key) in model" :key="key">
-      <ModelCard :model="mod" :role="role"/>
+      <ModelCard :model="mod" :role="role" :criterias="criterias" :rang="key+1"/>
     </div>
 
   </div>

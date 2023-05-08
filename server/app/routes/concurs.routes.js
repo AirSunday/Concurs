@@ -42,6 +42,10 @@ module.exports = (app) => {
   //
   router.post("/model/update", model.update);
   //
+  router.post("/model/sendScore", model.sendScore);
+  //
+  router.post("/model/getScore", model.getScore);
+  //
   router.get("/image/:filename", competition.sendImage);
   //
   router.post("/isAdmin", role.isAdmin);

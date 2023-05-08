@@ -227,7 +227,7 @@ textarea:focus {
   text-align: center;
   transition: 0.25s;
   display: block;
-  width: 30%;
+  width: 35%;
 }
 
 .btn-second{
