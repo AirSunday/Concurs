@@ -241,7 +241,6 @@ exports.getOneCompetition = async (req, res) => {
             judges: usersJudge,
             models: usersModels
         };
-        console.log(criterias)
         res.status(200).send(response);
     } catch (err) {
         res.status(500).send({

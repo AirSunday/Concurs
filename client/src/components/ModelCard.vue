@@ -25,7 +25,7 @@
       <EditModel :model="model"/>
     </div>
 
-    <div class="rated" v-bind:class="{ ratedFalse: !rated, ratedTrue: rated}">
+    <div v-if="role === 'approval judge'" class="rated" v-bind:class="{ ratedFalse: !rated, ratedTrue: rated}">
       <p v-if="rated">Оценено</p>
       <p v-else>Не оценено</p>
     </div>
