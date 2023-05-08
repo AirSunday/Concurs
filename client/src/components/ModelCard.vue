@@ -7,7 +7,7 @@
       <p class="TitleCompetition">{{name}}</p>
       <p class="content">{{text}}</p>
       <div class="rightContentDown">
-        <p>{{participant}}: Имя участника</p>
+        <p>{{userName}}: Имя участника</p>
         <p>{{view}}: Вид модели</p>
         <p>{{scale}}: Масштаб</p>
         <p>{{score}}: Оценка</p>
@@ -91,7 +91,7 @@ export default {
         participantId: this.model.participant,
         image: this.model.image,
       }).then(() => {
-        this.reloadPage();
+        // this.reloadPage();
       })
     },
   }
