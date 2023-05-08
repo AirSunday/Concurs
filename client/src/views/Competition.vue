@@ -113,8 +113,8 @@ export default {
           this.minitext = res.data.minitext;
           this.fulltext = res.data.fulltext;
           this.criterias = res.data.criterias;
-          this.imageUrl = 'https://whoisa.ru/api/image/' + res.data.image_path;
-          // this.imageUrl = 'http://localhost:8080/api/image/' + res.data.image_path;
+          // this.imageUrl = 'https://whoisa.ru/api/image/' + res.data.image_path;
+          this.imageUrl = 'http://localhost:8080/api/image/' + res.data.image_path;
           this.organizer_id = res.data.organizer_id;
           this.organizer_name = res.data.organizer_name;
           this.judge = res.data.judges;
@@ -150,7 +150,6 @@ export default {
                           else if(isJudge === 'approval')     this.role = 'approval judge';
                           else if(isJudge === 'not approval') this.role = 'not approval judge';
                           else                                this.role = 'user';
-                          console.log(this.role)
                         })
                     })
                 })
