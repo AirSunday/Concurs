@@ -353,8 +353,8 @@ exports.GetParticipants = async (req, res) => {
 exports.GetJudges = async (req, res) => {
     try {
         const personId = req.body.personId;
-        const judges = await Judge.findAll({where: {person_id: personId}});
-        const competitionPromises = judges.map((model) => {
+        const judges = await Judge.findAll({where: {person_id: personId, approval: true}});
+        const competitionPromises = judges.map((judges) => {
             return Competition.findAll({where: {id: judges.competitiondbId}});
         });
         const competitions = await Promise.all(competitionPromises);
