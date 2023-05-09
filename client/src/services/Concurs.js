@@ -130,7 +130,6 @@ class Concurs {
       }
     });
   }
-
   createModel(data) {
     return http.post(`/model/create`, data, {
       headers: {
@@ -175,6 +174,27 @@ class Concurs {
   }
   isParticipant(data) {
     return http.post(`/isParticipant`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  GetOrganizers(data) {
+    return http.post(`/competition/GetOrganizers`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  GetJudges(data) {
+    return http.post(`/competition/GetJudges`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  GetParticipants(data) {
+    return http.post(`/competition/GetParticipants`, data, {
       headers: {
         'Content-Type': 'application/json'
       }

@@ -38,6 +38,12 @@ module.exports = (app) => {
   //
   router.post("/competition/deleteModel", competition.deleteModel);
   //
+  router.post("/competition/GetParticipants", competition.GetParticipants);
+  //
+  router.post("/competition/GetJudges", competition.GetJudges);
+  //
+  router.post("/competition/GetOrganizers", competition.GetOrganizers);
+  //
   router.post("/model/create", model.create);
   //
   router.post("/model/update", model.update);

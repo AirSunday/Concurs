@@ -157,9 +157,7 @@ export default {
 
       console.log(this.criterias)
       Concurs.createCompetition(formData).then((response) => {
-        console.log(response)
-        console.log(this.criterias)
-        // this.reloadPage();
+        this.reloadPage();
         this.criterias.forEach((criteria) => {
           Concurs.createCriteria({
             competitionId: response.data.competitionId,

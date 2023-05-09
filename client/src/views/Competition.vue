@@ -1,7 +1,11 @@
 <template>
   <AuthForm/>
   <div class="MainScreen">
-    <div class="btnCopmetition" v-if="role === 'user'">
+    <div class="GoToHome" @click="$router.push('/')">
+      &#8962;
+    </div>
+
+    <div class="btnCopmetition" v-if="role === 'user' && !(month <= 0 && day <= 0)">
       <AddModel/>
       <button @click="SendRequestJudge">Стать судьей</button>
     </div>
@@ -98,6 +102,10 @@ export default {
       ShowJudgeList: false,
       countApprovalJudge: 0,
     }
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.GetOneCompetition();
+    next();
   },
   created() {
     this.GetOneCompetition();
@@ -239,6 +247,22 @@ export default {
   background-color: var(--color-back-second);
 }
 
+.GoToHome{
+  position: absolute;
+  z-index: 4;
+  align-content: center;
+  left: 20px;
+  top: -15px;
+  font-size: min(calc(4em + 1vw));
+  background: var(--color-main);
+  color: var(--color-back-second);
+  border-radius: 0 0 20px 20px;
+}
+
+.GoToHome:hover {
+  cursor: pointer;
+}
+
 .JudgeApproval{
   color: #92f16d;
 }
@@ -302,7 +326,7 @@ export default {
 
 .btnCopmetition {
   position: absolute;
-  left: 0;
+  left: 45px;
   width: 60%;
 }
 
@@ -334,6 +358,11 @@ export default {
 @media screen and (max-width: 1000px) {
   .btnCopmetition button{
     left: 0;
+    width: 50%;
+  }
+
+  .btnCopmetition {
+    left: 55px;
     width: 70%;
   }
 }

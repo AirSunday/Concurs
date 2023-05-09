@@ -244,7 +244,7 @@ textarea:focus {
 
 @media screen and (max-width: 1000px) {
   .btn {
-    width: 70%;
+    width: 50%;
   }
 }
 

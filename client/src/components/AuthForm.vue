@@ -45,10 +45,74 @@
   </div>
 
   <div v-else>
-    <div class="AuthFormBack" v-if="viewAuthForm">
-      Теперь только на выход
-      <div class="btn btn-primary btn-large btn-block" @click="SignOut">Выйти с двух ног</div>
+    <div class="profile" v-if="viewAuthForm">
+      <div class="info">
+        <p>Добро пожаловать, {{userName}}!</p>
+        <span v-if="organizers.length > 0">Вы организвали:</span>
+        <div  v-if="organizers.length > 0" class="Split">
+          <p @click="GoToOrganizer(-1)"> &#706; </p>
+          <p @click="$router.push('/competition/' + organizers[indexOrganizer][0].id)" class="NameCompetition">
+            {{organizers[indexOrganizer][0].name}}
+          </p>
+          <p @click="GoToOrganizer(1)"> &#707; </p>
+        </div>
+
+        <span v-if="judges.length > 0">Вы судите:</span>
+        <div  v-if="judges.length > 0" class="Split">
+          <p @click="GoToJudge(-1)"> &#706; </p>
+          <p @click="$router.push('/competition/' + judges[indexJudge][0].id)" class="NameCompetition">
+            {{judges[indexJudge][0].name}}
+          </p>
+          <p @click="GoToJudge(1)"> &#707; </p>
+        </div>
+
+        <span v-if="participants.length > 0">Вы участвуете:</span>
+        <div  v-if="participants.length > 0" class="Split">
+          <p @click="GoToParticipant(-1)"> &#706; </p>
+          <p @click="$router.push('/competition/' + participants[indexParticipant][0].id)" class="NameCompetition">
+            {{participants[indexParticipant][0].name}}
+          </p>
+          <p @click="GoToParticipant(1)"> &#707; </p>
+        </div>
+      </div>
+      <div class="profileBtn">
+        <button class="btn btn2" @click="SignOut">Выйти</button>
+        <button class="btn btn2" @click="EditProfileShow = !EditProfileShow">Редактировать</button>
+      </div>
     </div>
+    <div class="AuthFormMain" v-if="EditProfileShow">
+      <div class="title">
+        <div class="app-title">
+          <h1>Изменение профиля</h1>
+        </div>
+        <h1 class="close" @click="EditProfileShow = !EditProfileShow;">&#10006;</h1>
+      </div>
+
+      <div class="login-form">
+        <div class="control-group">
+          <input type="text" class="login-field" v-model="Name" placeholder="Имя">
+          <label class="login-field-icon fui-user"></label>
+        </div>
+
+        <div class="control-group">
+          <input type="text" class="login-field" v-model="Email" placeholder="Почта">
+          <label class="login-field-icon fui-user"></label>
+        </div>
+
+        <div class="control-group">
+          <input type="password" class="login-field" v-model="Password" placeholder="Пароль">
+          <label class="login-field-icon fui-lock"></label>
+        </div>
+
+        <div class="control-group">
+          <input type="password" class="login-field" v-model="Repassword" placeholder="Повторите пароль">
+          <label class="login-field-icon fui-lock"></label>
+        </div>
+
+        <div class="btn" @click="EditProfile">Изменить</div>
+      </div>
+    </div>
+    <div class="AuthFormBack" v-if="EditProfileShow"></div>
   </div>
 
   <button class="AuthFormTitle" @click="viewAuthForm = !viewAuthForm; CheckSession();">{{ PAuthStatus }}</button>
@@ -73,6 +137,13 @@ export default {
           Email: "",
           Password: "",
           Repassword: "",
+          indexOrganizer: 0,
+          indexJudge: 0,
+          indexParticipant: 0,
+          organizers: [],
+          judges: [],
+          participants: [],
+          EditProfileShow: false,
         };
     },
     created() {
@@ -91,6 +162,7 @@ export default {
                     .then(res => {
                       this.userName = res.data.name;
                       this.PAuthStatus = 'Профиль';
+                      this.GetCompoetitionProfile();
                     });
                 }
                 else {
@@ -119,7 +191,7 @@ export default {
                   this.Password = "";
                   this.Repassword = "";
                   this.viewAuthForm = false;
-                  this.reloadPage();
+                  // this.reloadPage();
                 }
                 else
                   this.AddAlert({ status: false, message: "Ошибка в авторизации" });
@@ -155,7 +227,7 @@ export default {
                             this.Password = "";
                             this.Repassword = "";
                             this.viewAuthForm = false;
-                            this.reloadPage();
+                            // this.reloadPage();
                           }
                           else this.AddAlert({ status: false, message: "Ошибка в регистрации" });
                         })
@@ -190,6 +262,86 @@ export default {
         },
         reloadPage() {
           location.reload();
+        },
+        GetCompoetitionProfile(){
+          Concurs.GetOrganizers({personId: this.authId})
+              .then((res) => {
+                  this.organizers = res.data;
+              })
+              .catch(() => {this.AddAlert({ status: false, message: "Ошибка в получение организатора" });});
+
+          Concurs.GetJudges({personId: this.authId})
+              .then((res) => {
+                  this.judges = res.data;
+              })
+              .catch(() => {this.AddAlert({ status: false, message: "Ошибка в получение судьи" });});
+
+          Concurs.GetParticipants({personId: this.authId})
+              .then((res) => {
+                  this.participants = res.data;
+              })
+              .catch(() => {this.AddAlert({ status: false, message: "Ошибка в получение участника" });});
+        },
+        GoToParticipant(temp){
+          this.indexParticipant += temp;
+          if(this.indexParticipant >= this.participants.length)
+            this.indexParticipant = this.participants.length - 1;
+          else if(this.indexParticipant < 0)
+            this.indexParticipant = 0;
+        },
+        GoToJudge(temp){
+          this.indexJudge += temp;
+          if(this.indexJudge >= this.judges.length)
+            this.indexJudge = this.judges.length - 1;
+          else if(this.indexJudge < 0)
+            this.indexJudge = 0;
+        },
+        GoToOrganizer(temp){
+          this.indexOrganizer += temp;
+          if(this.indexOrganizer >= this.organizers.length)
+            this.indexOrganizer = this.organizers.length - 1;
+          else if(this.indexOrganizer < 0)
+            this.indexOrganizer = 0;
+        },
+        EditProfile(){
+          if (this.Password === this.Repassword) {
+            const data = {
+              email: this.Email,
+            };
+            Concurs.findUserByEmail(data)
+                .then(response => {
+                  if (response.data.name) {
+                    this.AddAlert({ status: false, message: "Почта занята" });
+                    return;
+                  }
+                  else {
+                    const editUser = {
+                      userId: this.authId,
+                      name: this.Name,
+                      email: this.Email,
+                      password: this.Password,
+                    };
+                    Concurs.updateUser(editUser)
+                        .then(response => {
+                          if(response.statusText === "OK"){
+                            this.AddAlert({ status: true, message: "Успешное изменение" });
+                            this.CheckSession();
+                            this.Name = "";
+                            this.Email = "";
+                            this.Password = "";
+                            this.Repassword = "";
+                            this.EditProfileShow = false;
+                          }
+                          else this.AddAlert({ status: false, message: "Ошибка в изменении" });
+                        })
+                        .catch(() => {
+                          this.AddAlert({ status: false, message: "Ошибка в изменении" });
+                        });
+                  }
+                });
+          }
+          else
+            this.AddAlert({ status: false, message: "Пароли не совпадают" });
         }
     },
     components: { AlertMessages }
@@ -199,7 +351,7 @@ export default {
 <style scoped>
 .AuthFormTitle{
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   border: 2px solid transparent;
   border-radius: 20px;
   background: var(--color-main);
@@ -231,7 +383,7 @@ export default {
   width: 50%;
   min-width: 300px;
   max-width: 500px;
-  z-index: 4;
+  z-index: 6;
   padding: 10px;
   background: var(--color-second);
   border-radius: 30px;
@@ -241,7 +393,7 @@ export default {
   top: 0;
   right: 0;
   position: fixed;
-  z-index: 3;
+  z-index: 5;
   width: 100vw;
   height: 100vh;
   background: #000;
@@ -299,9 +451,9 @@ input:focus {
   border: 2px solid transparent;
   background: var(--color-main);
   color: #ffffff;
-  font-size: 16px;
+  font-size: calc(0.5em + 1vw);
   line-height: 25px;
-  padding: 10px 0;
+  padding: 0.5vw 1vw;
   text-decoration: none;
   text-shadow: none;
   box-shadow: none;
@@ -313,6 +465,75 @@ input:focus {
 
 .btn:hover {
   opacity: 0.7;
+}
+
+.btn2{
+  width: 40%;
+  margin: 0;
+}
+
+.profile{
+  position: absolute;
+  z-index: 3;
+  padding: 10px;
+  background: var(--color-second);
+  border-radius: 20px;
+  border: 2px solid var(--color-main);
+  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
+  right: calc((100vw - 1000px) / 2);
+  top: 20px;
+  width: 40vw;
+}
+
+.info{
+  margin: min(3vw, 40px) 0;
+  font-size: calc(0.5em + 1vw);
+  width: 100%;
+}
+
+.info span{
+  margin-left: 10px;
+  font-size: calc(0.2em + 1vw);
+}
+
+.Split{
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  background-color: #ECF0F1;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  padding: 10px;
+  transition: border .5s;
+  margin-bottom: min(3vw, 40px);
+}
+
+.Split:hover {
+  border: 2px solid var(--color-main);
+  box-shadow: none;
+}
+
+.Split p{
+  margin: 0;
+}
+
+.NameCompetition {
+  width: 90%
+}
+
+.Split p:hover{
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.profileBtn{
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
 }
 
 .app-down{
@@ -329,6 +550,18 @@ input:focus {
     right: 0;
     width: 40%;
   }
+  .profile{
+    right: 0;
+    width: 60vw;
+  }
+  .info{
+    margin: 35px 0;
+    font-size: 15px;
+  }
+  .info span{
+    font-size: 15px;
+  }
+
 }
 
 </style>

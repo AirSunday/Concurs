@@ -31,7 +31,6 @@ exports.create = (req, res) => {
     if(!filedata)
         res.send("Ошибка при загрузке файла");
     CreateOrganizer(req.body.userId, res).then((organizer) => {
-        console.log(organizer)
         Competition.create({
             organizer_id: organizer.id,
             name: req.body.name,
@@ -41,7 +40,6 @@ exports.create = (req, res) => {
             dateend: req.body.dateend,
             image: req.file.filename,
         }).then((competition) => {
-            console.log(competition)
             res.status(200).send({
                 message: "creat Competition",
                 competitionId: competition.id,
@@ -61,7 +59,6 @@ exports.createCriteria = (req, res) => {
             name: req.body.name,
             maxscore: req.body.maxscore,
         }).then(data => {
-            console.log(data)
             competition.addCriteria(data).then(() => {
                 res.status(200).send({
                     message: "creat Criteria",
@@ -214,9 +211,10 @@ exports.getOneCompetition = async (req, res) => {
             return { id: person.id, name: person.name, approval: judge.approval, id_judge: judge.id };
         }));
 
-        const models = await Model.findAll(
-            {order: [["score", "DESC"]]},
-            { where: { competitiondbId: competition.id } });
+        const models = await Model.findAll({
+                    order: [["score", "DESC"]],
+                    where: { competitiondbId: competition.id }
+        });
         const usersModels = await Promise.all(models.map(async model => {
             const participant = await Participant.findOne({ where: { id: model.participant }});
             const person = await Person.findOne({ where: { id: participant.person_id } });
@@ -330,3 +328,58 @@ exports.update = async (req, res) => {
         });
     })
 };
+
+exports.GetParticipants = async (req, res) => {
+    try {
+        const personId = req.body.personId;
+        const participants = await Participant.findAll({where: {person_id: personId}});
+        const modelPromises = participants.map((participant) => {
+            return Model.findAll({where: {participant: participant.id}});
+        });
+        const models = await Promise.all(modelPromises);
+        const competitionPromises = models.map((model) => {
+            return Competition.findAll({where: {id: model[0].competitiondbId}});
+        });
+        const competitions = await Promise.all(competitionPromises);
+        res.status(200).send(competitions);
+    }
+    catch {
+        res.status(500).send({
+            message: "Error getting participants",
+        });
+    }
+}
+
+exports.GetJudges = async (req, res) => {
+    try {
+        const personId = req.body.personId;
+        const judges = await Judge.findAll({where: {person_id: personId}});
+        const competitionPromises = judges.map((model) => {
+            return Competition.findAll({where: {id: judges.competitiondbId}});
+        });
+        const competitions = await Promise.all(competitionPromises);
+        res.status(200).send(competitions);
+    }
+    catch {
+        res.status(500).send({
+            message: "Error getting Judges",
+        });
+    }
+}
+
+exports.GetOrganizers = async (req, res) => {
+    try {
+        const personId = req.body.personId;
+        const organizers = await Organizer.findAll({where: {person_id: personId}});
+        const competitionPromises = organizers.map((organizer) => {
+            return Competition.findAll({where: {organizer_id: organizer.id}});
+        });
+        const competitions = await Promise.all(competitionPromises);
+        res.status(200).send(competitions);
+    }
+    catch {
+        res.status(500).send({
+            message: "Error getting Organizers ",
+        });
+    }
+}
