@@ -228,7 +228,7 @@ export default {
         approval: approval,
         judge_id: this.judge[key].id_judge,
       }).then(() => {
-        this.GetOneCompetition();
+        location.reload();
         this.AddAlert({ status: true, message: "Список судей изменен" });
       }).catch(() => {
 

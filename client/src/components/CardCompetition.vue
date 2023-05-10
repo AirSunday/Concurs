@@ -110,7 +110,7 @@ export default {
   align-items: center;
   z-index: 5;
   height: 30px;
-  bottom: 5px;
+  top: 25px;
   right: 5px;
   border-radius: 20px;
   text-decoration: none;

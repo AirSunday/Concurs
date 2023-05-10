@@ -439,6 +439,7 @@ exports.getWinner = async (req, res) => {
         const competitionId = req.body.competitionId;
         const models = await Model.findAll({
             order: [["score", "DESC"]],
+            limit: 3,
             where: { competitiondbId: competitionId }
         });
         const usersModels = await Promise.all(models.map(async model => {
