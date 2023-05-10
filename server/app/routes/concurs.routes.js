@@ -5,6 +5,8 @@ module.exports = (app) => {
   const competition = require("../controllers/competition.controller.js");
   const model = require("../controllers/model.controller.js");
   const role = require("../controllers/role.controller.js");
+  const multer  = require('multer')
+  const upload = multer({ dest: 'app/uploads/' })
 
   const router = require("express").Router();
   //
@@ -18,9 +20,11 @@ module.exports = (app) => {
   //
   router.post("/users/update", user.update);
   //
-  router.post("/competition/create", competition.create);
+  router.post("/competition/create", upload.array('files', 2), competition.create);
   //
-  router.post("/competition/update", competition.update);
+  router.post("/competition/getWinner", competition.getWinner);
+  //
+  router.post("/competition/update", upload.single('filedata'), competition.update);
   //
   router.post("/competition/createCriteria", competition.createCriteria);
   //
@@ -34,6 +38,8 @@ module.exports = (app) => {
   //
   router.post("/competition/getOneCompetition", competition.getOneCompetition);
   //
+  router.post("/model/GetOneModel", model.getOneModel);
+  //
   router.post("/competition/deleteCompetition", competition.deleteCompetition);
   //
   router.post("/competition/deleteModel", competition.deleteModel);
@@ -44,7 +50,7 @@ module.exports = (app) => {
   //
   router.post("/competition/GetOrganizers", competition.GetOrganizers);
   //
-  router.post("/model/create", model.create);
+  router.post("/model/create", upload.single('filedata'), model.create);
   //
   router.post("/model/update", model.update);
   //
@@ -53,6 +59,8 @@ module.exports = (app) => {
   router.post("/model/getScore", model.getScore);
   //
   router.get("/image/:filename", competition.sendImage);
+  //
+  router.get("/file/:filename", competition.sendFile);
   //
   router.post("/isAdmin", role.isAdmin);
   //

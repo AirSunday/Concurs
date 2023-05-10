@@ -4,7 +4,6 @@
     <div class="GoToHome" @click="$router.push('/')">
       &#8962;
     </div>
-
     <div class="btnCopmetition" v-if="role === 'user' && !(month <= 0 && day <= 0)">
       <AddModel/>
       <button @click="SendRequestJudge">Стать судьей</button>
@@ -14,6 +13,11 @@
     </div>
     <div class="spaceEmpty"></div>
     <div class="CardTitle">
+      <a v-if="fileUrl !== ''" class="DownloadFile" :href="fileUrl" download>
+        <div>
+          <p>Положение &#129095;</p>
+        </div>
+      </a>
       <div class="right">
         <img :src="imageUrl" alt="">
       </div>
@@ -62,11 +66,9 @@
       <EditCompetition/>
       <button @click="DeleteCompetition">Удалить Конкурс</button>
     </div>
-
-    <div class="ModelList" v-for="(mod, key) in model" :key="key">
+    <div v-for="(mod, key) in model" :key="key">
       <ModelCard :model="mod" :role="role" :criterias="criterias" :rang="key+1"/>
     </div>
-
   </div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
@@ -78,6 +80,7 @@ import EditCompetition from "@/components/EditCompetition";
 import AlertMessages from "@/components/AlertMessages";
 import ModelCard from "@/components/ModelCard";
 import AddModel from "@/components/AddModel";
+import path from "@/services/path";
 
 export default {
   name: "CompetitionPage",
@@ -87,6 +90,7 @@ export default {
       name: '',
       user_id: '',
       minitext: '',
+      fileUrl: '',
       fulltext: '',
       datestart: '',
       dateend: '',
@@ -104,25 +108,24 @@ export default {
     }
   },
   beforeRouteUpdate(to, from, next) {
-    this.GetOneCompetition();
+    this.GetOneCompetition(to.params.id);
     next();
   },
   created() {
-    this.GetOneCompetition();
+    this.GetOneCompetition(this.$route.params.id);
   },
   methods: {
     AddAlert(mess){
       this.$refs.AddAlertMess.AddAlertMess(mess);
     },
-    GetOneCompetition() {
-      Concurs.getOneCompetition({id: this.$route.params.id})
+    GetOneCompetition(pageId) {
+      Concurs.getOneCompetition({id: pageId})
         .then((res) =>{
           this.name = res.data.name;
           this.minitext = res.data.minitext;
           this.fulltext = res.data.fulltext;
           this.criterias = res.data.criterias;
-          this.imageUrl = 'https://whoisa.ru/api/image/' + res.data.image_path;
-          // this.imageUrl = 'http://localhost:8080/api/image/' + res.data.image_path;
+          this.imageUrl = path.path + '/image/' + res.data.image_path;
           this.organizer_id = res.data.organizer_id;
           this.organizer_name = res.data.organizer_name;
           this.judge = res.data.judges;
@@ -135,6 +138,10 @@ export default {
           this.month = Math.floor(diffInMs / (1000 * 60 * 60 * 24 * 30));
           this.day = Math.floor(diffInMs / (1000 * 60 * 60 * 24)) % 30 + 1;
 
+          if(res.data.fileDop !== '')
+            this.fileUrl = path.path + "/file/" + res.data.fileDop;
+          else this.fileUrl = '';
+
           let isAdmin = false;
           let isJudge = 'not judge';
           let isOrganizer = false;
@@ -146,7 +153,7 @@ export default {
               Concurs.isJudge({competitionId: this.$route.params.id})
                 .then(res => {
                   isJudge = res.data.judge;
-                  Concurs.isOrganizer({organizerId: this.organizer_id})
+                  Concurs.isOrganizer({competitionId: this.$route.params.id})
                     .then(res => {
                       isOrganizer = res.data.organizer;
                       Concurs.isParticipant({competitionId: this.$route.params.id})
@@ -233,6 +240,28 @@ export default {
 </script>
 
 <style scoped>
+
+.DownloadFile{
+  opacity: 0.7;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  height: 30px;
+  top: 5px;
+  left: 5px;
+  border-radius: 20px;
+  text-decoration: none;
+  padding: 0 5px;
+  color: black;
+  background: hsl(0,0%,95%);
+  font-size: 15px;
+}
+
+.DownloadFile:hover {
+  opacity: 0.9;
+}
 
 .MainScreen{
   box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
@@ -393,6 +422,7 @@ export default {
 }
 
 .CardTitle{
+  position: relative;
   display: grid;
   border-radius: 20px;
   grid-template-columns: 5fr 5fr;
@@ -430,5 +460,12 @@ export default {
   border-radius: 20px 0 0 20px;
   height: 400px;
 }
+
+@media screen and (max-width: 500px) {
+  .DownloadFile{
+    font-size: 10px;
+  }
+}
+
 
 </style>

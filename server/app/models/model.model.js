@@ -29,7 +29,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         dateupload: {
             type: Sequelize.DATE,
-        },
+        }
     },
     {
         timestamps: false,

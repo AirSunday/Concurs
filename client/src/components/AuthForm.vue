@@ -191,7 +191,7 @@ export default {
                   this.Password = "";
                   this.Repassword = "";
                   this.viewAuthForm = false;
-                  // this.reloadPage();
+                  this.reloadPage();
                 }
                 else
                   this.AddAlert({ status: false, message: "Ошибка в авторизации" });
@@ -227,7 +227,7 @@ export default {
                             this.Password = "";
                             this.Repassword = "";
                             this.viewAuthForm = false;
-                            // this.reloadPage();
+                            this.reloadPage();
                           }
                           else this.AddAlert({ status: false, message: "Ошибка в регистрации" });
                         })

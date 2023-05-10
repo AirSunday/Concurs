@@ -9,6 +9,7 @@ const Competition = db.competitiondbs;
 const Participant = db.participantdbs;
 const Score = db.scoredbs;
 const Op = db.Sequelize.Op;
+const fs = require('fs');
 
 Competition.hasMany(Judge, {as: 'judge'});
 Competition.hasMany(Criteria, {as: 'criteria'});
@@ -27,9 +28,16 @@ async function CreateOrganizer(userId, res) {
 }
 
 exports.create = (req, res) => {
-    const filedata = req.file;
+    const filedata = req.files;
     if(!filedata)
         res.send("Ошибка при загрузке файла");
+
+    const imageName = filedata[0].filename;
+    let fileName = '';
+    if(filedata[1]){
+        fileName = filedata[1].filename;
+    }
+
     CreateOrganizer(req.body.userId, res).then((organizer) => {
         Competition.create({
             organizer_id: organizer.id,
@@ -38,7 +46,8 @@ exports.create = (req, res) => {
             fulltext: req.body.fulltext,
             datestart: req.body.datestart,
             dateend: req.body.dateend,
-            image: req.file.filename,
+            image: imageName,
+            fileDop: fileName,
         }).then((competition) => {
             res.status(200).send({
                 message: "creat Competition",
@@ -148,6 +157,7 @@ exports.getCompetition = (req, res) => {
                                 datestart: competition.dataValues.datestart,
                                 dateend: competition.dataValues.dateend,
                                 image_path: competition.dataValues.image,
+                                fileDop: competition.dataValues.fileDop,
                                 organizer_name: person.dataValues.name
                             };
                         });
@@ -164,7 +174,6 @@ exports.getCompetition = (req, res) => {
     });
 }
 
-const fs = require('fs');
 exports.sendImage = (req, res) => {
     const { filename } = req.params;
     const filePath = `app/uploads/${filename}`;
@@ -192,6 +201,39 @@ exports.sendImage = (req, res) => {
         const head = {
             'Content-Length': fileSize,
             'Content-Type': 'image/jpeg', // или другой формат картинки
+        };
+        res.writeHead(200, head);
+        fs.createReadStream(filePath).pipe(res);
+    }
+}
+
+exports.sendFile = (req, res) => {
+    const { filename } = req.params;
+    const filePath = `app/uploads/${filename}`;
+    const stat = fs.statSync(filePath);
+    const fileSize = stat.size;
+    const range = req.headers.range;
+
+    if (range) {
+        // если клиент запрашивает только часть файла
+        const parts = range.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        const chunksize = (end - start) + 1;
+        const file = fs.createReadStream(filePath, { start, end });
+        const head = {
+            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunksize,
+            'Content-Type': 'application/pdf', // или другой формат картинки
+        };
+        res.writeHead(206, head);
+        file.pipe(res);
+    } else {
+        // если клиент запрашивает весь файл
+        const head = {
+            'Content-Length': fileSize,
+            'Content-Type': 'application/pdf', // или другой формат картинки
         };
         res.writeHead(200, head);
         fs.createReadStream(filePath).pipe(res);
@@ -233,6 +275,7 @@ exports.getOneCompetition = async (req, res) => {
             datestart: competition.datestart,
             dateend: competition.dateend,
             image_path: competition.image,
+            fileDop: competition.fileDop,
             organizer_name: person.name,
             organizer_id: organizer.id,
             criterias: criterias,
@@ -267,6 +310,12 @@ exports.deleteCompetition = async (req, res) => {
                 console.error(err);
             }
         });
+        if(competition.dataValues.fileDop !== '')
+        await fs.unlink("app/uploads/" + competition.dataValues.fileDop, (err) => {
+            if (err) {
+                console.error(err);
+            }
+        });
 
         await Competition.destroy({ where: {id: competitionId}});
 
@@ -297,6 +346,7 @@ exports.deleteModel = async (req, res) => {
 
 exports.update = async (req, res) => {
     const filedata = req.file;
+
     const competitionId = req.body.competitionId;
     if(filedata) {
         await fs.unlink("app/uploads/" + req.body.imageUrl, (err) => {
@@ -382,4 +432,25 @@ exports.GetOrganizers = async (req, res) => {
             message: "Error getting Organizers ",
         });
     }
+}
+
+exports.getWinner = async (req, res) => {
+    try {
+        const competitionId = req.body.competitionId;
+        const models = await Model.findAll({
+            order: [["score", "DESC"]],
+            where: { competitiondbId: competitionId }
+        });
+        const usersModels = await Promise.all(models.map(async model => {
+            const participant = await Participant.findOne({ where: { id: model.participant }});
+            const person = await Person.findOne({ where: { id: participant.person_id } });
+            return { id: model.id, person_name: person.name, name: model.name, score: model.score };
+        }));
+        res.status(200).send(usersModels);
+    } catch (err) {
+        res.status(500).send({
+            message: "Error sending competition",
+            error: err
+        });
+}
 }

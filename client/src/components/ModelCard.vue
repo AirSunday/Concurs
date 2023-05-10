@@ -3,33 +3,32 @@
     <div class="Rang" v-if="rang < 4">
       <img :src="require(`@/components/images/${rang}.png`)"/>
     </div>
-    <div class="CardModel">
-      <div class="right">
-        <img :src="imagePath" alt="">
-      </div>
-      <div class="rightContent">
-        <p class="TitleCompetition">{{name}}</p>
-        <p class="content">{{text}}</p>
-        <div class="rightContentDown">
-          <p>{{userName}}: Имя участника</p>
-          <p>{{view}}: Вид модели</p>
-          <p>{{scale}}: Масштаб</p>
-          <p>{{score}}%: Оценка</p>
-          <p>{{dateupload.split('T')[0]}}: Дата загрузки</p>
-          <p></p>
+    <div class="showFullModel" @click="$router.push('/model/' + model.id)">
+      <div class="CardModel">
+        <div class="right">
+          <img :src="imagePath" alt="">
+        </div>
+        <div class="rightContent">
+          <p class="TitleCompetition">{{name}}</p>
+          <div class="rightContentDown">
+            <p>{{userName}}: Имя участника</p>
+            <p>{{view}}: Вид модели</p>
+            <p>{{scale}}: Масштаб</p>
+            <p>{{score}}%: Оценка</p>
+            <p>{{dateupload.split('T')[0]}}: Дата загрузки</p>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="manegeModel" v-if="personId === personIdNow || role === 'organizer' || role === 'admin'">
-      <button @click="DeleteModel">Удалить Модель</button>
-      <EditModel :model="model"/>
-    </div>
+      <div class="manegeModel" v-if="personId === personIdNow || role === 'organizer' || role === 'admin'">
+        <button @click="DeleteModel">Удалить Модель</button>
+        <EditModel :model="model"/>
+      </div>
 
-    <div v-if="role === 'approval judge'" class="rated" v-bind:class="{ ratedFalse: !rated, ratedTrue: rated}">
-      <p v-if="rated">Оценено</p>
-      <p v-else>Не оценено</p>
+      <div v-if="role === 'approval judge'" class="rated" v-bind:class="{ ratedFalse: !rated, ratedTrue: rated}">
+        <p v-if="rated">Оценено</p>
+        <p v-else>Не оценено</p>
+       </div>
     </div>
-
     <div class="criteriaModel" v-if="role === 'approval judge'">
       <div>
         <div class="criteria" v-for="(score, key) in scores" :key="key">
@@ -52,6 +51,7 @@
 import Concurs from "@/services/Concurs";
 import EditModel from "@/components/EditModel";
 import AlertMessages from "@/components/AlertMessages"
+import path from "@/services/path";
 
 export default {
   name: "ModelCard",
@@ -70,7 +70,8 @@ export default {
       personId: '',
       personIdNow: '',
       scores: [],
-      rated: true
+      rated: true,
+      showFullModel: false,
     }
   },
   props: {
@@ -100,8 +101,7 @@ export default {
       this.scale = this.model.scale;
       this.dateupload = this.model.dateupload;
       this.text = this.model.text;
-      // this.imagePath = "http://localhost:8080/api/image/" + this.model.image;
-      this.imagePath = "https://whoisa.ru/api/image/" + this.model.image;
+      this.imagePath = path.path + "/image/" + this.model.image;
       this.score = this.model.score;
       this.participant = this.model.participant;
       this.userName = this.model.person_name;
@@ -180,6 +180,10 @@ export default {
 </script>
 
 <style scoped>
+
+.showFullModel:hover {
+  opacity: 0.7;
+}
 
 .rated {
   position: relative;
@@ -345,7 +349,7 @@ export default {
   overflow: hidden;
   clip-path: polygon(0 0, 80% 0%, 100% 100%, 0% 100%);
   object-fit: cover;
-  height: 25vh;
+  height: 20vh;
 }
 
 .right img {

@@ -27,6 +27,10 @@ module.exports = (sequelize, Sequelize) => {
         image: {
             type: Sequelize.TEXT,
         },
+        fileDop: {
+            type: Sequelize.TEXT,
+        },
+
     },
     {
         timestamps: false,

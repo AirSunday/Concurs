@@ -65,6 +65,7 @@ export default {
       image: '',
       imageUrl: '',
       file: null,
+      fileDop: null,
       criterias: [{name: '', maxscore: ''}],
     }
   },
@@ -214,9 +215,9 @@ export default {
 
 .AddCompetitionForm{
   position: fixed;
-  top: 2vw;
+  z-index: 6;
+  top: 8vw;
   left: 20%;
-  transform: translate(-50%, 0);
   width: 70%;
   min-width: 300px;
   padding: 10px;

@@ -10,11 +10,11 @@
     </div>
 
     <div class="control-group">
-      <input type="text" maxlength="50" class="login-field" v-model="name" placeholder="Название">
+      <input type="text" maxlength="100" class="login-field" v-model="name" placeholder="Название (не более 100 символов)">
       <label class="login-field-icon fui-user"></label>
     </div>
     <div class="control-group">
-      <input type="text" maxlength="400" class="login-field" v-model="minitext" placeholder="Краткое описание">
+      <input type="text" maxlength="400" class="login-field" v-model="minitext" placeholder="Краткое описание (не более 400 символов)">
       <label class="login-field-icon fui-user"></label>
     </div>
     <div class="control-group">
@@ -31,7 +31,7 @@
     </div>
 
     <div class="cardCriteria" v-for="(criteria,key) in criterias" :key="key">
-      <input type="text" maxlength="50" v-model="criteria.name" placeholder="Название критерия">
+      <input type="text" maxlength="50" v-model="criteria.name" placeholder="Название критерия (не более 50 символов)">
       <input type="number" v-model="criteria.maxscore" min="0" placeholder="Максимальная оценка">
       <p class="cardCriteriaP" @click="deleteCriteria(key)">&#128465;</p>
     </div>
@@ -45,6 +45,13 @@
       <button class="input-file-btn" @click="chooseFiles()">Выберите картинку</button>
       <p v-if="file">Картинка загружена</p>
     </div>
+
+    <div class="control-group imgPicker">
+      <input type="file" id="fileUploadDop" @change="onFileChangeDop" hidden/>
+      <button class="input-file-btn" @click="chooseFilesDop()">Добавить положение конкурса (.pdf)</button>
+      <p v-if="fileDop">Файл загружен</p>
+    </div>
+
     <button class="btn-second" @click.prevent="AddCompetition();">Создать конкурс</button>
   </div>
   <AlertMessages ref="AddAlertMess"/>
@@ -73,6 +80,7 @@ export default {
       dateend: '',
       image: '',
       file: null,
+      fileDop: null,
       criterias: [{name: '', maxscore: ''}],
     }
   },
@@ -105,6 +113,12 @@ export default {
     },
     chooseFiles: function() {
       document.getElementById("fileUpload").click()
+    },
+    chooseFilesDop: function() {
+      document.getElementById("fileUploadDop").click()
+    },
+    onFileChangeDop(e) {
+      this.fileDop = e.target.files[0];
     },
     onFileChange(e) {
       this.file = e.target.files[0];
@@ -147,7 +161,8 @@ export default {
       }
       this.ModView = !this.ModView;
       let formData = new FormData();
-      formData.append("filedata", this.file);
+      formData.append("files", this.file);
+      if(this.fileDop !== null) formData.append("files", this.fileDop);
       formData.append("userId", this.organizer_id);
       formData.append("name", this.name);
       formData.append("datestart", this.datestart);
@@ -229,7 +244,7 @@ export default {
 }
 
 .AddCompetitionForm{
-  position: fixed;
+  position: absolute;
   top: 2vw;
   left: 50%;
   transform: translate(-50%, 0);
@@ -339,8 +354,9 @@ textarea:focus {
   text-shadow: none;
   box-shadow: none;
   transition: 0.25s;
-  display: block;
   width: 50%;
+  margin: 0 50%;
+  transform: translate(-50%, 0);
 }
 
 .btn:hover {

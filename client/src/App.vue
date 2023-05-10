@@ -21,7 +21,7 @@ export default {
 
 :root {
   --color-back: #00ffc2;
-  --color-main: #a3d3c8;
+  --color-main: #7dd2be;
   --color-second: #fff;
   --color-back-second: #e8f6f3;
 }

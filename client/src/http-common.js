@@ -1,9 +1,9 @@
 import axios from "axios";
+import path from "@/services/path";
 
 const instance = axios.create({
   withCredentials: true,
-   baseURL: "https://whoisa.ru/api",
-  // baseURL: "http://localhost:8080/api",
+  baseURL: path.path,
 });
 //modelCard CardCompetition Competition server http-common
 export default instance;

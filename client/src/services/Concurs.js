@@ -67,6 +67,13 @@ class Concurs {
       }
     });
   }
+  getWinner(data) {
+    return http.post(`/competition/getWinner`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   sendScore(data) {
     return http.post(`/model/sendScore`, data, {
       headers: {
@@ -111,6 +118,13 @@ class Concurs {
   }
   getOneCompetition(data) {
     return http.post(`/competition/getOneCompetition`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  GetOneModel(data) {
+    return http.post(`/model/GetOneModel`, data, {
       headers: {
         'Content-Type': 'application/json'
       }

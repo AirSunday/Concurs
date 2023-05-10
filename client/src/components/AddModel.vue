@@ -10,7 +10,7 @@
     </div>
 
     <div class="control-group">
-      <input type="text" maxlength="50" class="login-field" v-model="name" placeholder="Название">
+      <input type="text" maxlength="100" class="login-field" v-model="name" placeholder="Название (не более 100 символов)">
     </div>
     <div class="control-group">
       <input type="text" maxlength="30" class="login-field" v-model="view" placeholder="Вид модели">
@@ -19,7 +19,7 @@
       <input type="text" maxlength="20" class="login-field" v-model="scale" placeholder="Масштаб">
     </div>
     <div class="control-group">
-      <textarea class="textareaModel" id="message" name="message" rows="4" cols="50" maxlength="200" v-model="text" placeholder="Описание"></textarea>
+      <textarea class="textareaModel" id="message" name="message" rows="4" cols="50" maxlength="600" v-model="text" placeholder="Описание"></textarea>
     </div>
 
     <div class="control-group imgPicker">

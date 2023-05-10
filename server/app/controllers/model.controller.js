@@ -5,6 +5,7 @@ const Model = db.modeldbs;
 const Participant = db.participantdbs;
 const Competition = db.competitiondbs;
 const Score = db.scoredbs;
+const Person = db.persondbs;
 const Judge = db.judgedbs;
 const Op = db.Sequelize.Op;
 const Sessiondb = db.sessiondbs;
@@ -195,5 +196,24 @@ exports.getScore = async (req, res) => {
     }
     catch{
         res.status(500).send("Error in geting score");
+    }
+}
+
+exports.getOneModel = async (req, res) => {
+    try {
+        const model = await Model.findOne({where: {id: req.body.id}});
+        const participant = await Participant.findOne({where: {id: model.participant}});
+        const person = await Person.findOne({where: {id: participant.person_id}});
+
+        res.status(200).send({
+            ...model,
+            person_id: person.id,
+            person_name: person.name,
+        });
+    } catch (err) {
+        res.status(500).send({
+            message: "Error sending competition",
+            error: err
+        });
     }
 }

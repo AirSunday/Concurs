@@ -53,15 +53,18 @@ exports.isJudge = (req, res) => {
 exports.isOrganizer = (req, res) => {
     FindSession(req).then((val) => {
         const userId = val;
-        const organizerId = req.body.organizerId;
+        const competitionId = req.body.competitionId;
 
-        Organizer.findOne({ where: {
-                person_id: userId,
-                id: organizerId
-        }}).then((organizer) => {
-            if(organizer) res.status(200).send({organizer: true});
-            else res.status(200).send({organizer: false});
-        });
+        Competition.findOne({where: {id: competitionId}})
+            .then((competition) => {
+                Organizer.findOne({ where: {
+                        person_id: userId,
+                        id: competition.organizer_id,
+                    }}).then((organizer) => {
+                    if(organizer) res.status(200).send({organizer: true});
+                    else res.status(200).send({organizer: false});
+                });
+            })
     });
 }
 
