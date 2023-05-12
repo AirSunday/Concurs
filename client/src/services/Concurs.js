@@ -1,11 +1,12 @@
 import http from "../http-common";
 
 class Concurs {
-  CreateUser(data) {
-    return http.post(`/users/create`, data, {
+  CreateUser(formData) {
+    return http.post(`/users/create`, formData, {
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'multipart/form-data'
+      },
+      enctype: 'multipart/form-data'
     });
   }
   Authentication(data) {

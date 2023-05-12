@@ -1,4 +1,5 @@
 <template>
+  <GoPrev :path="'/'"/>
   <AuthForm/>
   <div class="competitions">
     <div class="emptySpace"></div>
@@ -19,16 +20,27 @@ import AuthForm from "@/components/AuthForm";
 import Concurs from "@/services/Concurs";
 import AlertMessages from '@/components/AlertMessages.vue';
 import CardCompetition from '@/components/CardCompetition.vue';
+import GoPrev from "@/components/GoPrev";
 
 export default {
   name: "CompetitionsPage",
-  components: { AuthForm, AlertMessages, CardCompetition },
+  components: { AuthForm, AlertMessages, CardCompetition, GoPrev },
   data() {
     return {
       Competition: [],
       imageUrl: '',
       width: window.innerWidth,
+      previousPage: null
     }
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.previousPage = from.fullPath
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    this.previousPage = from.fullPath;
+    next();
   },
   created() {
     this.GetCompetition();

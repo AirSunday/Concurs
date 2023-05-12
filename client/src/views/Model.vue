@@ -1,5 +1,5 @@
 <template>
-
+  <GoPrev :path="'/competition/' + competitionId"/>
   <AuthForm/>
   <div class="competitions">
     <div class="spaceEmpty"></div>
@@ -54,13 +54,14 @@
 
 <script>
 import AuthForm from "@/components/AuthForm";
+import GoPrev from "@/components/GoPrev";
 import Concurs from "@/services/Concurs";
 import AlertMessages from "@/components/AlertMessages";
 import path from "@/services/path";
 
 export default {
   name: "ModelPage",
-  components: {AuthForm, AlertMessages},
+  components: {AuthForm, AlertMessages, GoPrev},
   data() {
     return {
       user_id: '',
@@ -83,10 +84,20 @@ export default {
       rated: true,
       scores: [],
       criterias: [],
+      previousPage: null
     }
   },
   beforeRouteUpdate(to, from, next) {
     this.GetOneModel(to.params.id);
+    next();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.previousPage = from.fullPath
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    this.previousPage = from.fullPath;
     next();
   },
   created() {
@@ -176,6 +187,9 @@ export default {
           competitionId: this.competitionId,
           modelId: this.modelId, })
             .then((res) => {
+              this.scores = [];
+              this.criterias = [];
+              this.rated = true;
               this.getScore();
               if(res.statusText == "OK")
                 this.AddAlert({ status: true, message: "Оценено " + score.name });

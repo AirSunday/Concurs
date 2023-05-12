@@ -7,6 +7,7 @@
       </div>
     </a>
     <div class="imgCard">
+      <div class="endWaterMark" v-if="datenow >= dateend"><p>Окончено</p></div>
       <img :src="imageUrl" alt="">
     </div >
     <div class="content" v-if="!showFullText">
@@ -24,7 +25,15 @@
       </div>
     </div>
     <div class="hideText" v-if="showFullText">
-      <p>{{competition.minitext}}</p>
+      <div class="winners" v-if="datenow >= dateend">
+        <div v-for="(winner ,key) in winners" :key="key">
+          <p class="rangTitile">&#9733; Место {{key + 1}} &#9733;</p>
+          <p>Участник: {{winner.person_name}}</p>
+          <p>Модель: {{winner.name}}</p>
+          <p>Оценка: {{winner.score}}%</p>
+        </div>
+      </div>
+      <p v-else>{{competition.minitext}}</p>
     </div>
   </div>
 
@@ -105,6 +114,7 @@ export default {
   border: 3px solid transparent;
   background: linear-gradient(var(--color-main), var(--color-main-second));
   box-shadow: inset 0px 0px 0px 100vw #fff;
+  border-radius: 25px;
   transition: all 0.1s ease-in-out;
 }
 
@@ -149,12 +159,37 @@ export default {
   margin: 0;
 }
 
+.rangTitile{
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 22px;
+}
+
 .imgCard {
+  position: relative;
   overflow: hidden;
   height: 200px;
   border: 2px solid transparent;
   background: linear-gradient(var(--color-main), var(--color-main-second));
   box-shadow: inset 0px 0px 0px 100vw #fff;
+  border-radius: 20px 20px 0 0;
+}
+
+.endWaterMark {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(170, 170, 170, 0.55);
+  opacity: 0.9;
+  display: flex;
+  z-index: 5;
+  justify-content: center;
+  align-items: center;
+}
+
+.endWaterMark p{
+  color: #fff;
+  font-size: 18px;
 }
 
 .imgCard img {
@@ -176,7 +211,9 @@ export default {
     width: 210px;
     height: 310px;
   }
-
+  .rangTitile{
+    font-size: 16px;
+  }
   .content{
     width: 200px;
     height: 200px;

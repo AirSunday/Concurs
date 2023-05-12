@@ -41,6 +41,13 @@ exports.isAuthenticated = (req, res) => {
 }
 
 exports.create = (req, res) => {
+
+    let filePath;
+    const filedata = req.file;
+    if(!filedata) filePath = '';
+    else filePath = filedata.filename;
+
+
   PersonDB.findAll({
     attributes: [[sequelize.fn("count", sequelize.col("name")), "user_count"]],
   }).then((CountUser) => {
@@ -48,6 +55,7 @@ exports.create = (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
+      photo: filePath,
     };
 
     PersonDB.create(person)
@@ -113,14 +121,15 @@ exports.findOneEmail = (req, res) => {
 };
 
 exports.update = (req, res) => {
+  const filedata = req.file;
   const id = req.body.userId;
-
   PersonDB.findOne({ where: { id: id } }).then((user) => {
     if (user) {
       user.name = req.body.name === "" ? user.name : req.body.name;
       user.email = req.body.email === "" ? user.email : req.body.email;
       user.password =
         req.body.password === "" ? user.password : req.body.password;
+      if(filedata) user.photo = filedata.filename;
     }
 
     user

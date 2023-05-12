@@ -11,6 +11,12 @@
         <div class="closeBtn" v-if="width <= 1000" @click="viewAuthForm = !viewAuthForm">&#10006;</div>
 
         <div class='welcome'>Добро пожаловать, {{userName}}!</div>
+        <div class="photoProfile">
+          <div class="photo">
+            <img v-if="imageUrl !== ''" :src="imageUrl"/>
+            <img v-else :src="require(`@/components/images/profileNone.png`)" class="photoProfile"/>
+          </div>
+        </div>
 
         <div class='subtitle' v-if="organizers.length > 0">Вы организвали</div>
         <div  v-if="organizers.length > 0" class="Split">
@@ -53,6 +59,7 @@
 <script>
 import Concurs from '../services/Concurs';
 import AlertMessages from './AlertMessages.vue';
+import path from "@/services/path";
 
 export default {
     name: "AuthForm",
@@ -76,6 +83,7 @@ export default {
           participants: [],
           EditProfileShow: false,
           width: window.innerWidth,
+          imageUrl: '',
         };
     },
     created() {
@@ -97,6 +105,8 @@ export default {
                   Concurs.findUserById({ userId: this.authId })
                     .then(res => {
                       this.userName = res.data.name;
+                      if(res.data.photo !== '')
+                        this.imageUrl = path.path + '/image/' + res.data.photo;
                       this.PAuthStatus = 'Профиль';
                       this.GetCompoetitionProfile();
                     });
@@ -197,6 +207,30 @@ button:focus {
   color: rgba(255, 255, 255, 0.65);
 }
 
+.photo{
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  width: 100px;
+  height: 100px;
+}
+
+.photoProfile img{
+  border-radius: 25px;
+  width: 100px; /* задаем ширину */
+  height: 100px; /* задаем высоту */
+  object-fit: cover; /* масштабируем изображение */
+  object-position: center center; /* выравниваем по центру */
+}
+
+.photoProfile{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .profileShow{
   position: fixed;
   top: 20px;
@@ -227,6 +261,7 @@ button:focus {
 
 .container{
   position: fixed;
+  z-index: 7;
   right: 0;
   width: 360px;
   height: 100%;
@@ -265,6 +300,9 @@ button:focus {
 
 .NameCompetition{
   width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: center;
 }
 

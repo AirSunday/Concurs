@@ -7,6 +7,11 @@
       <p v-else>Не оценено</p>
     </div>
     <div class="imgCard">
+      <div class="rang" v-if="rang < 4">
+        <p v-if="rang===1">➊</p>
+        <p v-if="rang===2">➋</p>
+        <p v-if="rang===3">➌</p>
+      </div>
       <img :src="imagePath" alt="">
     </div >
     <div class="content" v-if="!showFullText">
@@ -68,6 +73,7 @@ export default {
   created() {
     this.SetModel();
     this.CheckSession();
+      this.getScore();
   },
   methods: {
     SetModel(){
@@ -98,7 +104,7 @@ export default {
       location.reload();
     },
     getScore() {
-      Concurs.getCriteria({competitionId: this.competitionId})
+      Concurs.getCriteria({competitionId: this.$route.params.id})
           .then(criterias => {
             criterias.data.forEach(criteria => {
               this.scores.push({
@@ -110,8 +116,8 @@ export default {
             })
 
             Concurs.getScore({
-              competitionId: this.competitionId,
-              modelId: this.modelId
+              competitionId: this.$route.params.id,
+              modelId: this.model.id
             })
                 .then(res => {
                   if (res.data.length === 0) this.rated = false;
@@ -138,6 +144,7 @@ export default {
   background: linear-gradient(var(--color-main), var(--color-main-second));
   box-shadow: inset 0px 0px 0px 100vw #fff;
   transition: all 0.1s ease-in-out;
+  border-radius: 25px;
 }
 
 .card:hover{
@@ -187,6 +194,8 @@ export default {
   border: 2px solid transparent;
   background: linear-gradient(var(--color-main), var(--color-main-second));
   box-shadow: inset 0px 0px 0px 100vw #fff;
+  position: relative;
+  border-radius: 20px 20px 0 0;
 }
 
 .imgCard img {
@@ -196,6 +205,20 @@ export default {
   transform-origin: center;
   transform: scale(1.001);
   transition: transform 0.4s ease-in-out;
+}
+
+.rang{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  color: #ffffff;
+  background: rgba(110, 108, 108, 0.55);
+  opacity: 0.95;
+  display: flex;
+  z-index: 5;
+  justify-content: center;
+  align-items: center;
+  font-size: 200px;
 }
 
 @media (max-width: 800px) {
@@ -208,7 +231,9 @@ export default {
     width: 210px;
     height: 310px;
   }
-
+  .rang{
+    font-size: 100px;
+  }
   .content{
     width: 200px;
     height: 200px;

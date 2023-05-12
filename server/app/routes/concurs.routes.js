@@ -10,7 +10,7 @@ module.exports = (app) => {
 
   const router = require("express").Router();
   //
-  router.post("/users/create", user.create);
+  router.post("/users/create", upload.single('filedata'), user.create);
   //
   router.post("/users", user.Authentication);
   //
@@ -20,7 +20,7 @@ module.exports = (app) => {
   //
   router.post("/users/findOneEmail", user.findOneEmail);
   //
-  router.post("/users/update", user.update);
+  router.post("/users/update", upload.single('filedata'), user.update);
   //
   router.post("/competition/create", upload.array('files', 2), competition.create);
   //

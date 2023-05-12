@@ -1,4 +1,6 @@
 <template>
+  <GoPrev v-if="month <= 0 && day <= 0" :path="'/competition/end'"/>
+  <GoPrev v-else :path="'/competition'"/>
   <AuthForm/>
   <div class="competitions">
     <div class="spaceEmpty"></div>
@@ -65,7 +67,8 @@
     </div>
     <div class="modelList">
       <div class="model" v-for="(mod, key) in model" :key="key">
-        <ModelCard :model="mod" :rang="key+1" :role="role"/>
+        <ModelCard v-if="month <= 0 && day <= 0" :model="mod" :rang="key+1" :role="role"/>
+        <ModelCard v-else :model="mod" :rang="4" :role="role"/>
       </div>
     </div>
   </div>
@@ -80,10 +83,11 @@ import Concurs from "@/services/Concurs";
 import AlertMessages from "@/components/AlertMessages";
 import ModelCard from "@/components/ModelCard";
 import path from "@/services/path";
+import GoPrev from "@/components/GoPrev";
 
 export default {
   name: "CompetitionPage",
-  components: {AuthForm, AlertMessages, ModelCard},
+  components: {AuthForm, AlertMessages, ModelCard, GoPrev},
   data() {
     return {
       name: '',
@@ -104,10 +108,20 @@ export default {
       role: 'user',
       ShowJudgeList: false,
       countApprovalJudge: 0,
+      previousPage: null
     }
   },
   beforeRouteUpdate(to, from, next) {
     this.GetOneCompetition(to.params.id);
+    next();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.previousPage = from.fullPath
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    this.previousPage = from.fullPath;
     next();
   },
   created() {
@@ -468,6 +482,7 @@ export default {
   background: linear-gradient(var(--color-main), var(--color-main-second));
   box-shadow: inset 0px 0px 0px 100vw #fff;
   transition: all 0.1s ease-in-out;
+  border-radius: 25px;
 }
 
 .fullText{
@@ -478,6 +493,7 @@ export default {
   background: linear-gradient(var(--color-main), var(--color-main-second));
   box-shadow: inset 0px 0px 0px 100vw #fff;
   transition: all 0.1s ease-in-out;
+  border-radius: 25px;
 }
 
 .fullText p{
@@ -495,7 +511,8 @@ export default {
 }
 
 .right img {
-  height: 400px;
+  height: 100%;
+  border-radius: 21px 0 0 21px;
 }
 
 @media screen and (max-width: 1200px) {

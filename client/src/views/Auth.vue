@@ -14,6 +14,13 @@
             <div v-if="ModeViewAuthForm === 'Регистрация'">
                 <input type="password" class='input-line full-width' v-model="Repassword" placeholder="Повторите пароль">
             </div>
+
+          <div class="control-group imgPicker">
+            <input type="file" id="fileUpload" @change="onFileChange" hidden/>
+            <button class='ghost-round full-width' @click="chooseFiles()">Выберите картинку</button>
+            <p v-if="file">Картинка загружена</p>
+          </div>
+
         </div>
         <div>
           <button class='ghost-round full-width' v-if="ModeViewAuthForm === 'Регистрация'" @click="Sign">{{ ModeViewAuthForm }}</button>
@@ -44,7 +51,17 @@ export default {
       Email: "",
       Password: "",
       Repassword: "",
+      file: null,
     };
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.previousPage = from.fullPath
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    this.previousPage = from.fullPath;
+    next();
   },
   created() {
     this.CheckSession();
@@ -52,6 +69,12 @@ export default {
   methods: {
     AddAlert(mess){
       this.$refs.AddAlertMess.AddAlertMess(mess);
+    },
+    chooseFiles: function() {
+      document.getElementById("fileUpload").click()
+    },
+    onFileChange(e) {
+      this.file = e.target.files[0];
     },
     ChangeModeAuthForm(){
       this.Name = "";
@@ -102,12 +125,12 @@ export default {
                 return;
               }
               else {
-                const newUser = {
-                  name: this.Name,
-                  email: this.Email,
-                  password: this.Password,
-                };
-                Concurs.CreateUser(newUser)
+                let formData = new FormData();
+                formData.append("filedata", this.file);
+                formData.append("name", this.Name);
+                formData.append("email", this.Email);
+                formData.append("password", this.Password);
+                Concurs.CreateUser(formData)
                     .then(response => {
                       if(response.statusText === "OK"){
                         this.AddAlert({ status: true, message: "Успешная регистрация" });
@@ -268,10 +291,14 @@ button:focus {
   letter-spacing: 0.02rem;
 }
 
-.menu {
-  background: rgba(0, 0, 0, 0.2);
-  width: 100%;
-  height: 50px;
+.imgPicker img{
+  border-radius: 20px 0 0 20px;
+  width: 100px;
+  height: 100px;
+}
+
+.imgPicker p{
+  margin: 0;
 }
 
 .window {
@@ -286,7 +313,7 @@ button:focus {
   flex-flow: column;
   box-shadow: 0px 15px 50px 10px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
-  height: 560px;
+  height: 660px;
   width: 360px;
   background: #fff;
 }
@@ -296,7 +323,7 @@ button:focus {
   background: linear-gradient(var(--color-main), var(--color-main-second));
   opacity: 0.85;
   filter: alpha(opacity=85);
-  height: 560px;
+  height: 660px;
   position: absolute;
   width: 360px;
   z-index: 1;
