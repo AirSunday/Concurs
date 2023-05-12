@@ -1,11 +1,13 @@
 <template>
+
   <AuthForm/>
-  <div class="MainScreen">
-    <div class="GoToHome" @click="$router.push('/competition/' + competitionId) ">
-      &#11120;
-    </div>
+  <div class="competitions">
     <div class="spaceEmpty"></div>
     <div class="CardTitle">
+      <div v-if="role === 'approval judge'" class="rated" v-bind:class="{ ratedFalse: !rated, ratedTrue: rated}">
+        <p v-if="rated">Оценено</p>
+        <p v-else>Не оценено</p>
+      </div>
       <div class="right">
         <img :src="imagePath" alt="">
       </div>
@@ -23,12 +25,30 @@
     <div class="fullText">
       <p>{{text}}</p>
     </div>
-    <div class="manegeModel" v-if="personId === personIdNow || role === 'organizer' || role === 'admin'">
+    <div class="menegerCompetitionBtn" v-if="personIdNow === personId || role === 'organizer' || role === 'admin'">
       <button @click="DeleteModel">Удалить Модель</button>
-      <EditModel :model="model"/>
+      <button @click="$router.push('/edit/model/' + $route.params.id)">Изменить Модель</button>
     </div>
 
+    <div v-if="role === 'approval judge'" class="ratedClass">
+      <div class="criteriaModel" v-if="role === 'approval judge'">
+        <div>
+          <div class="criteria" v-for="(score, key) in scores" :key="key">
+            <p class="welcome">{{score.name}}: </p>
+            <div class="criteriaScore">
+              <input class="input-line full-width" type="number" v-model="score.score" :min="0" :max="score.maxscore" placeholder="Максимальная оценка"/>
+              <p class="welcome"> / {{score.maxscore}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="btnSend">
+          <button class="ghost-round" @click="SendScore">Оценить</button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <div class="spaceEmpty"></div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
 
@@ -37,11 +57,10 @@ import AuthForm from "@/components/AuthForm";
 import Concurs from "@/services/Concurs";
 import AlertMessages from "@/components/AlertMessages";
 import path from "@/services/path";
-import EditModel from "@/components/EditModel";
 
 export default {
   name: "ModelPage",
-  components: {AuthForm, AlertMessages, EditModel},
+  components: {AuthForm, AlertMessages},
   data() {
     return {
       user_id: '',
@@ -61,6 +80,9 @@ export default {
       model: {},
       personIdNow: '',
       image: '',
+      rated: true,
+      scores: [],
+      criterias: [],
     }
   },
   beforeRouteUpdate(to, from, next) {
@@ -109,10 +131,58 @@ export default {
                               else if(isJudge === 'approval')     this.role = 'approval judge';
                               else if(isJudge === 'not approval') this.role = 'not approval judge';
                               else                                this.role = 'user';
+
+                              if(this.role === 'approval judge') this.getScore();
                             })
                       })
                 })
           })
+    },
+    getScore(){
+      Concurs.getCriteria({competitionId: this.competitionId})
+          .then(criterias => {
+            criterias.data.forEach(criteria => {
+              this.scores.push({
+                id: criteria.id,
+                name: criteria.name,
+                score: 0,
+                maxscore: criteria.maxscore
+              })
+            })
+
+            Concurs.getScore({
+              competitionId: this.competitionId,
+              modelId: this.modelId
+            })
+                .then(res => {
+                  if(res.data.length === 0) this.rated = false;
+                  res.data.forEach(nowScore => {
+                    const score = this.scores.find(score => score.id === nowScore.criteria_id);
+                    if (score) {
+                      score.score = nowScore.score;
+                    }
+                    else this.rated = false;
+                  });
+                });
+          })
+    },
+    SendScore(){
+      this.scores.forEach(score => {
+        if(score.score > score.maxscore) score.score = score.maxscore;
+        Concurs.sendScore({
+          criteriaId: score.id,
+          score: score.score,
+          maxScore: score.maxscore,
+          competitionId: this.competitionId,
+          modelId: this.modelId, })
+            .then((res) => {
+              this.getScore();
+              if(res.statusText == "OK")
+                this.AddAlert({ status: true, message: "Оценено " + score.name });
+              else
+                this.AddAlert({ status: false, message: "Ошибка в оценке " + score.name });
+            })
+      })
     },
     GetOneModel(pageId) {
       Concurs.GetOneModel({id: pageId})
@@ -140,6 +210,8 @@ export default {
               imageUrl: this.imagePath,
             }
 
+
+
             this.GetRole();
           })
     },
@@ -161,67 +233,65 @@ export default {
 
 <style scoped>
 
-.MainScreen{
-  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
-  position: absolute;
-  right: 50%;
-  transform: translate(+50%, 0);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  width: min(100%, 1017px);
-  background-color: var(--color-back-second);
+.ratedClass{
+  text-align: justify;
+  width: calc(100% - 50px);
 }
 
-.GoToHome{
-  position: absolute;
-  z-index: 4;
-  align-content: center;
-  left: 20px;
-  top: -15px;
-  font-size: min(calc(3em + 1vw));
-  background: var(--color-main);
-  color: var(--color-back-second);
-  border-radius: 0 0 20px 20px;
+.competitions{
+  width: calc(100vw - 360px);
 }
 
-.GoToHome:hover {
-  cursor: pointer;
+@media (max-width: 1000px) {
+  .competitions{
+    width: calc(100vw - 20px);
+  }
 }
 
 .spaceEmpty {
-  height: 12vh;
+  height: 80px;
   width: 100px;
 }
 
-.btnCopmetition button {
-  margin-bottom: 10px;
-  margin-left: 3vw;
-  border: 2px solid transparent;
-  border-radius: 20px;
-  background: var(--color-main);
-  color: #ffffff;
-  font-size: calc(0.5em + 1vw);
-  line-height: 25px;
-  padding: 0.5vw 1vw;
-  text-align: right;
-  text-decoration: none;
-  text-shadow: none;
-  box-shadow: none;
-  transition: 0.25s;
-  display: block;
-  width: 50%;
-  left: calc((100vw - 1058px) / 2);
-  top: 20px;
+.menegerCompetitionBtn{
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  width: calc(100% - 50px);
+  margin: 0 20px;
+  transition: all 0.1s ease-in-out;
+  border-radius: 25px;
 }
 
-.btnCopmetition button:hover {
+.menegerCompetitionBtn button{
+  cursor: pointer;
+  margin: 10px;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  -webkit-align-self: flex-end;
+  align-self: flex-end;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 2.5em;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+  width: 35%;
+}
+
+.menegerCompetitionBtn button:hover {
   opacity: 0.7;
 }
 
 @media screen and (max-width: 1000px) {
   .btnCopmetition button{
+    font-size: 14px;
+    left: 0;
+    width: 50%;
+  }
+  .menegerCompetitionBtn button{
+    font-size: 14px;
     left: 0;
     width: 50%;
   }
@@ -247,29 +317,32 @@ export default {
   word-wrap: break-word;
   text-align: right;
   margin: 10px 10px;
-  font-size: min(calc(1.5em + 1vw), 35px);
-  color: transparent;
-  -webkit-text-stroke: 1px #222222;
+  font-size: min(calc(1.3em + 1vw), 35px);
+  font-weight: 200;
+  letter-spacing: 0.05rem;
 }
 
 .CardTitle{
   position: relative;
   display: grid;
-  border-radius: 20px;
   grid-template-columns: 5fr 5fr;
-  width: 100%;
+  width: calc(100% - 50px);
+  margin: 0 20px;
   height: 100%;
-  background: #fff;
-  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
+  border: 3px solid transparent;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  box-shadow: inset 0px 0px 0px 100vw #fff;
+  transition: all 0.1s ease-in-out;
 }
 
 .fullText{
   text-align: justify;
-  border-radius: 20px;
-  width: 100%;
-  margin: 10px;
-  background: #fff;
-  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
+  width: calc(100% - 50px);
+  margin: 10px 20px;
+  border: 3px solid transparent;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  box-shadow: inset 0px 0px 0px 100vw #fff;
+  transition: all 0.1s ease-in-out;
 }
 
 .fullText p{
@@ -278,7 +351,6 @@ export default {
 }
 
 .right {
-  border-radius: 20px 0 0 20px;
   position: relative;
   overflow: hidden;
   clip-path: polygon(0 0, 80% 0%, 100% 100%, 0% 100%);
@@ -288,43 +360,157 @@ export default {
 }
 
 .right img {
-  border-radius: 20px 0 0 20px;
   height: 400px;
 }
 
 
-.manegeModel{
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
+.criteriaModel{
+  border-radius: 30px;
+  width: 600px;
+  margin: 10px 20px;
+  padding: 10px 0;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  transition: all 0.1s ease-in-out;
 }
 
-.manegeModel button{
-  margin: 10px 10vw 20px 10vw;
-  border: 2px solid transparent;
-  border-radius: 20px;
-  background: var(--color-main);
-  color: #ffffff;
-  font-size: min(calc(0.5em + 1vw), 15px);
-  line-height: 25px;
-  padding: 0.5vw 1vw;
+.input-line {
+  border: none;
+  background: none;
+  line-height: 2.4em;
+  color: #fff;
+  font-weight: 300;
+  letter-spacing: 0.02rem;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+  width: 100px;
+  height: 30px;
+  margin: 0;
+  text-align: right;
+
+}
+
+.input-line:focus {
+  outline: none;
+  border-color: #fff;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+.welcome {
+  margin: 0;
+  font-weight: 200;
   text-align: center;
-  transition: 0.25s;
-  display: block;
-  width: 35%;
+  font-size: 1.5rem;
+  letter-spacing: 0.05rem;
+  color: #fff;
 }
 
-.manegeModel button:hover {
-  opacity: 0.7;
+.criteria {
+  margin: 10px;
+  display: flex;
+  align-items: center;
 }
 
-@media screen and (max-width: 1000px) {
-  .mangingModel button{
-    left: 0;
-    width: 30%;
+.criteriaScore {
+  display: flex;
+  align-items: center;
+}
+
+.ghost-round {
+  cursor: pointer;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  -webkit-align-self: flex-end;
+  align-self: flex-end;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 2.5em;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+  width: 200px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-left: 10px;
+}
+
+.ghost-round:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+.ratedTrue{
+  background: #b0ecae;
+}
+
+.ratedFalse{
+  background: #ecaeae;
+}
+
+.rated{
+  position: absolute;
+  top: 10px;
+  padding: 3px;
+  left: -3px;
+  z-index: 5;
+}
+
+.rated p {
+  margin: 10px;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+@media screen and (max-width: 1200px) {
+  .TitleCompetition{
+    font-size: 21px;
+    font-weight: 150;
+    letter-spacing: 0;
   }
 }
 
+@media screen and (max-width: 630px) {
+  .criteriaModel {
+    width: 500px;
+  }
+}
 
+@media screen and (max-width: 500px) {
+  .DownloadFile{
+    font-size: 10px;
+  }
+  .TitleCompetition{
+    font-size: 18px;
+  }
+  .CardTitle {
+    grid-template-columns: 2fr 10fr;
+  }
+  .right {
+    width: 20vw;
+  }
+  .criteriaModel {
+    border-radius: 30px;
+    width: 300px;
+  }
+  .ghost-round{
+    font-size: 15px;
+  }
+  .welcome{
+    font-size: 17px;
+  }
+  .input-line{
+    font-size: 17px;
+  }
+}
 
 </style>

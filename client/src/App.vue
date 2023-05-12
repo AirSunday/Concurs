@@ -1,13 +1,5 @@
 <template>
-
-  <div class="bg"></div>
-  <div class="bg bg2"></div>
-  <div class="bg bg3"></div>
-  <div class="content">
-    <router-view></router-view>
-  </div>
-
-
+  <router-view></router-view>
 </template>
 
 <script>
@@ -20,8 +12,9 @@ export default {
 <style>
 
 :root {
-  --color-back: #00ffc2;
+  --color-back: #d2fff1;
   --color-main: #7dd2be;
+  --color-main-second: #8CA6DB;
   --color-second: #fff;
   --color-back-second: #e8f6f3;
 }
@@ -38,47 +31,5 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   }
-
-html {
-  height:100%;
-}
-
-body {
-  margin:0;
-}
-
-.bg {
-  animation:slide 3s ease-in-out infinite alternate;
-  background-image: linear-gradient(-60deg, #b2b2b2 50%, #ffffff 50%);
-  bottom:0;
-  left:-50%;
-  opacity:.5;
-  position:fixed;
-  right:-50%;
-  top:0;
-  z-index:-1;
-}
-
-.bg2 {
-  animation-direction:alternate-reverse;
-  animation-duration:4s;
-}
-
-.bg3 {
-  animation-duration:5s;
-}
-
-h1 {
-  font-family:monospace;
-}
-
-@keyframes slide {
-  0% {
-    transform:translateX(-25%);
-  }
-  100% {
-    transform:translateX(25%);
-  }
-}
 
 </style>

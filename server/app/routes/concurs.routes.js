@@ -14,6 +14,8 @@ module.exports = (app) => {
   //
   router.post("/users", user.Authentication);
   //
+  router.post("/users/isAuthenticated", user.isAuthenticated);
+  //
   router.post("/users/findOneId", user.findOneId);
   //
   router.post("/users/findOneEmail", user.findOneEmail);
@@ -36,6 +38,8 @@ module.exports = (app) => {
   //
   router.post("/competition/getCompetition", competition.getCompetition);
   //
+  router.post("/competition/getCompetitionEnd", competition.getCompetitionEnd);
+  //
   router.post("/competition/getOneCompetition", competition.getOneCompetition);
   //
   router.post("/model/GetOneModel", model.getOneModel);
@@ -50,9 +54,11 @@ module.exports = (app) => {
   //
   router.post("/competition/GetOrganizers", competition.GetOrganizers);
   //
+  router.post("/competition/getCriteria", competition.getCriteria);
+  //
   router.post("/model/create", upload.single('filedata'), model.create);
   //
-  router.post("/model/update", model.update);
+  router.post("/model/update", upload.single('filedata'), model.update);
   //
   router.post("/model/sendScore", model.sendScore);
   //

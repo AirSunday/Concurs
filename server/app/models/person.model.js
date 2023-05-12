@@ -23,6 +23,9 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.TEXT,
             allowNull: false,
         },
+        photo: {
+            type: Sequelize.TEXT,
+        }
     };
 
     const User = sequelize.define("usersdb", mappings, {

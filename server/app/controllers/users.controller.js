@@ -27,6 +27,19 @@ exports.Authentication = (req, res) => {
   });
 };
 
+exports.isAuthenticated = (req, res) => {
+    FindSession(req).then((val) => {
+        PersonDB.findOne({where: {id: val}}).then((person) => {
+            if(person)
+                res.status(200).send({ login: true });
+            else
+                res.status(200).send({ login: false });
+        });
+    }).catch(() => {
+        res.status(500).send({ login: false });
+    })
+}
+
 exports.create = (req, res) => {
   PersonDB.findAll({
     attributes: [[sequelize.fn("count", sequelize.col("name")), "user_count"]],

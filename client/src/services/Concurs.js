@@ -15,6 +15,13 @@ class Concurs {
       }
     });
   }
+  isAuthenticated(data) {
+    return http.post(`/users/isAuthenticated`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   findUserById(data) {
     return http.post(`/users/findOneId`, data, {
       headers: {
@@ -67,6 +74,13 @@ class Concurs {
       }
     });
   }
+  getCriteria(data) {
+    return http.post(`/competition/getCriteria`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   getWinner(data) {
     return http.post(`/competition/getWinner`, data, {
       headers: {
@@ -111,6 +125,13 @@ class Concurs {
   }
   getCompetition(data) {
     return http.post(`/competition/getCompetition`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+  getCompetitionEnd(data) {
+    return http.post(`/competition/getCompetitionEnd`, data, {
       headers: {
         'Content-Type': 'application/json'
       }

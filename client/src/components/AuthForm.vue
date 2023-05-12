@@ -1,54 +1,18 @@
 <template>
-  <div v-if="PAuthStatus === 'Авторизация'">
-    <div class="AuthFormMain" v-if="viewAuthForm">
-      <div class="title">
-        <div class="app-title">
-          <h1>{{ ModeViewAuthForm }}</h1>
-        </div>
-        <h1 class="close" @click="viewAuthForm = !viewAuthForm;">&#10006;</h1>
-      </div>
 
-      <div class="login-form">
-        <div v-if="ModeViewAuthForm === 'Регистрация'">
-          <div class="control-group">
-            <input type="text" class="login-field" v-model="Name" placeholder="Имя">
-            <label class="login-field-icon fui-user"></label>
-          </div>
-        </div>
-
-        <div class="control-group">
-          <input type="text" class="login-field" v-model="Email" placeholder="Почта">
-          <label class="login-field-icon fui-user"></label>
-        </div>
-
-        <div class="control-group">
-          <input type="password" class="login-field" v-model="Password" placeholder="Пароль">
-          <label class="login-field-icon fui-lock"></label>
-        </div>
-
-        <div v-if="ModeViewAuthForm === 'Регистрация'">
-          <div class="control-group">
-            <input type="password" class="login-field" v-model="Repassword" placeholder="Повторите пароль">
-            <label class="login-field-icon fui-lock"></label>
-          </div>
-        </div>
-
-        <div class="btn" v-if="ModeViewAuthForm === 'Регистрация'" @click="Sign">{{ ModeViewAuthForm }}</div>
-        <div class="btn" v-else @click="Login">{{ ModeViewAuthForm }}</div>
-
-        <div class="app-down">
-          <h1 @click="ChangeModeAuthForm">{{ ReverseModeViewAuthForm }}</h1>
-        </div>
-      </div>
-    </div>
-    <div class="AuthFormBack" v-if="viewAuthForm"></div>
+  <div v-if="width <= 1000" class="profileShow">
+    <img :src="require(`@/components/images/profile.png`)" @click="viewAuthForm = !viewAuthForm"/>
   </div>
 
-  <div v-else>
-    <div class="profile" v-if="viewAuthForm">
-      <div class="info">
-        <p>Добро пожаловать, {{userName}}!</p>
-        <span v-if="organizers.length > 0">Вы организвали:</span>
+  <div class="container" v-if="width > 1000 || viewAuthForm">
+    <div class='window'>
+      <div class='overlay'></div>
+      <div class="content">
+        <div class="closeBtn" v-if="width <= 1000" @click="viewAuthForm = !viewAuthForm">&#10006;</div>
+
+        <div class='welcome'>Добро пожаловать, {{userName}}!</div>
+
+        <div class='subtitle' v-if="organizers.length > 0">Вы организвали</div>
         <div  v-if="organizers.length > 0" class="Split">
           <p @click="GoToOrganizer(-1)"> &#706; </p>
           <p @click="$router.push('/competition/' + organizers[indexOrganizer][0].id)" class="NameCompetition">
@@ -57,7 +21,7 @@
           <p @click="GoToOrganizer(1)"> &#707; </p>
         </div>
 
-        <span v-if="judges.length > 0">Вы судите:</span>
+        <div class='subtitle' v-if="judges.length > 0">Вы судите</div>
         <div  v-if="judges.length > 0" class="Split">
           <p @click="GoToJudge(-1)"> &#706; </p>
           <p @click="$router.push('/competition/' + judges[indexJudge][0].id)" class="NameCompetition">
@@ -66,7 +30,7 @@
           <p @click="GoToJudge(1)"> &#707; </p>
         </div>
 
-        <span v-if="participants.length > 0">Вы участвуете:</span>
+        <div class='subtitle' v-if="participants.length > 0">Вы участвуете</div>
         <div  v-if="participants.length > 0" class="Split">
           <p @click="GoToParticipant(-1)"> &#706; </p>
           <p @click="$router.push('/competition/' + participants[indexParticipant][0].id)" class="NameCompetition">
@@ -74,48 +38,15 @@
           </p>
           <p @click="GoToParticipant(1)"> &#707; </p>
         </div>
-      </div>
-      <div class="profileBtn">
-        <button class="btn btn2" @click="SignOut">Выйти</button>
-        <button class="btn btn2" @click="EditProfileShow = !EditProfileShow">Редактировать</button>
-      </div>
-    </div>
-    <div class="AuthFormMain" v-if="EditProfileShow">
-      <div class="title">
-        <div class="app-title">
-          <h1>Изменение профиля</h1>
-        </div>
-        <h1 class="close" @click="EditProfileShow = !EditProfileShow;">&#10006;</h1>
-      </div>
 
-      <div class="login-form">
-        <div class="control-group">
-          <input type="text" class="login-field" v-model="Name" placeholder="Имя">
-          <label class="login-field-icon fui-user"></label>
+        <div class="profileBtn">
+          <button class='ghost-round full-width' @click="EditProfile">Изменить профиль</button>
+          <button class='ghost-round full-width' @click="SignOut">Выйти</button>
         </div>
 
-        <div class="control-group">
-          <input type="text" class="login-field" v-model="Email" placeholder="Почта">
-          <label class="login-field-icon fui-user"></label>
-        </div>
-
-        <div class="control-group">
-          <input type="password" class="login-field" v-model="Password" placeholder="Пароль">
-          <label class="login-field-icon fui-lock"></label>
-        </div>
-
-        <div class="control-group">
-          <input type="password" class="login-field" v-model="Repassword" placeholder="Повторите пароль">
-          <label class="login-field-icon fui-lock"></label>
-        </div>
-
-        <div class="btn" @click="EditProfile">Изменить</div>
       </div>
     </div>
-    <div class="AuthFormBack" v-if="EditProfileShow"></div>
   </div>
-
-  <button class="AuthFormTitle" @click="viewAuthForm = !viewAuthForm; CheckSession();">{{ PAuthStatus }}</button>
 <AlertMessages ref="AddAlertMess"/>
 </template>
 
@@ -144,14 +75,19 @@ export default {
           judges: [],
           participants: [],
           EditProfileShow: false,
+          width: window.innerWidth,
         };
     },
     created() {
-        this.CheckSession();
+      this.CheckSession();
+      window.addEventListener("resize", this.updateWidth);
     },
     methods: {
         AddAlert(mess){
             this.$refs.AddAlertMess.AddAlertMess(mess);
+        },
+        updateWidth() {
+          this.width = window.innerWidth;
         },
         CheckSession() {
           Concurs.Authentication()
@@ -170,75 +106,6 @@ export default {
                   this.authId = 0;
                 }
             });
-        },
-        ChangeModeAuthForm(){
-          const temp = this.ModeViewAuthForm;
-          this.ModeViewAuthForm = this.ReverseModeViewAuthForm;
-          this.ReverseModeViewAuthForm = temp;
-        },
-        Login(){
-          const user = {
-            email: this.Email,
-            password: this.Password
-          };
-          Concurs.signIn(user)
-              .then(response => {
-                if(response.statusText === "OK"){
-                  this.AddAlert({ status: true, message: "Успешная авторизация" });
-                  this.CheckSession();
-                  this.Name = "";
-                  this.Email = "";
-                  this.Password = "";
-                  this.Repassword = "";
-                  this.viewAuthForm = false;
-                  this.reloadPage();
-                }
-                else
-                  this.AddAlert({ status: false, message: "Ошибка в авторизации" });
-              }).catch(() => {
-            this.AddAlert({ status: false, message: "Ошибка в авторизации" });
-          });
-        },
-        Sign(){
-          if (this.Password === this.Repassword) {
-            const data = {
-              email: this.Email,
-            };
-            Concurs.findUserByEmail(data)
-                .then(response => {
-                  if (response.data.name) {
-                    this.AddAlert({ status: false, message: "Почта занята" });
-                    return;
-                  }
-                  else {
-                    const newUser = {
-                      name: this.Name,
-                      email: this.Email,
-                      password: this.Password,
-                    };
-                    Concurs.CreateUser(newUser)
-                        .then(response => {
-                          if(response.statusText === "OK"){
-                            this.AddAlert({ status: true, message: "Успешная регистрация" });
-                            this.CheckSession();
-                            this.Login();
-                            this.Name = "";
-                            this.Email = "";
-                            this.Password = "";
-                            this.Repassword = "";
-                            this.viewAuthForm = false;
-                            this.reloadPage();
-                          }
-                          else this.AddAlert({ status: false, message: "Ошибка в регистрации" });
-                        })
-                        .catch(() => {
-                          this.AddAlert({ status: false, message: "Ошибка в регистрации" });
-                        });
-                  }
-                });
-          }
-          else
-            this.AddAlert({ status: false, message: "Пароли не совпадают" });
         },
         SignOut() {
           Concurs.signOut({})
@@ -304,44 +171,7 @@ export default {
             this.indexOrganizer = 0;
         },
         EditProfile(){
-          if (this.Password === this.Repassword) {
-            const data = {
-              email: this.Email,
-            };
-            Concurs.findUserByEmail(data)
-                .then(response => {
-                  if (response.data.name) {
-                    this.AddAlert({ status: false, message: "Почта занята" });
-                    return;
-                  }
-                  else {
-                    const editUser = {
-                      userId: this.authId,
-                      name: this.Name,
-                      email: this.Email,
-                      password: this.Password,
-                    };
-                    Concurs.updateUser(editUser)
-                        .then(response => {
-                          if(response.statusText === "OK"){
-                            this.AddAlert({ status: true, message: "Успешное изменение" });
-                            this.CheckSession();
-                            this.Name = "";
-                            this.Email = "";
-                            this.Password = "";
-                            this.Repassword = "";
-                            this.EditProfileShow = false;
-                          }
-                          else this.AddAlert({ status: false, message: "Ошибка в изменении" });
-                        })
-                        .catch(() => {
-                          this.AddAlert({ status: false, message: "Ошибка в изменении" });
-                        });
-                  }
-                });
-          }
-          else
-            this.AddAlert({ status: false, message: "Пароли не совпадают" });
+          this.$router.push({ path: '/edit/profile' });
         }
     },
     components: { AlertMessages }
@@ -349,219 +179,270 @@ export default {
 </script>
 
 <style scoped>
-.AuthFormTitle{
-  position: absolute;
-  z-index: 3;
-  border: 2px solid transparent;
-  border-radius: 20px;
-  background: var(--color-main);
-  color: #ffffff;
-  font-size: calc(0.5em + 1vw);
-  line-height: 25px;
-  padding: 0.5vw 1vw;
-  text-align: left;
-  text-decoration: none;
-  text-shadow: none;
-  box-shadow: none;
-  transition: 0.25s;
-  display: block;
-  width: 20%;
-  right: calc((100vw - 1000px) / 2);
-  top: 20px;
+body,
+html {
   margin: 0;
-}
-
-.AuthFormTitle:hover {
-  opacity: 0.7;
-}
-
-.AuthFormMain{
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 50%;
-  min-width: 300px;
-  max-width: 500px;
-  z-index: 6;
-  padding: 10px;
-  background: var(--color-second);
-  border-radius: 30px;
-}
-
-.AuthFormBack{
-  top: 0;
-  right: 0;
-  position: fixed;
-  z-index: 5;
-  width: 100vw;
-  height: 100vh;
-  background: #000;
-  opacity: 0.8;
-}
-
-.title{
-  display: flex;
-  padding-left: 10%;
-}
-
-.close:hover{
-  opacity: 0.8;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-*:focus {
-  outline: none;
-}
-
-.app-title {
-  width: 90%;
-  font-size: 0.8em;
-}
-
-.login-form {
-  text-align: center;
-}
-.control-group {
-  margin-bottom: 10px;
+  height: 100%;
 }
 
 input {
-  text-align: center;
-  background-color: #ECF0F1;
-  border: 2px solid transparent;
-  border-radius: 20px;
-  font-size: 16px;
-  font-weight: 200;
-  padding: 10px;
-  width: 80%;
-  transition: border .5s;
+  border: none;
 }
 
-input:focus {
-  border: 2px solid var(--color-main);
-  box-shadow: none;
+button:focus {
+  outline: none;
 }
 
-.btn {
-  border-radius: 20px;
-  border: 2px solid transparent;
-  background: var(--color-main);
-  color: #ffffff;
-  font-size: calc(0.5em + 1vw);
-  line-height: 25px;
-  padding: 0.5vw 1vw;
-  text-decoration: none;
-  text-shadow: none;
-  box-shadow: none;
-  transition: 0.25s;
-  display: block;
-  width: 50%;
-  margin: 0 auto;
+::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.65);
 }
 
-.btn:hover {
-  opacity: 0.7;
-}
-
-.btn2{
-  width: 40%;
-  margin: 0;
-}
-
-.profile{
-  position: absolute;
-  z-index: 3;
-  padding: 10px;
-  background: var(--color-second);
-  border-radius: 20px;
-  border: 2px solid var(--color-main);
-  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
-  right: calc((100vw - 1000px) / 2);
+.profileShow{
+  position: fixed;
   top: 20px;
-  width: 40vw;
+  right: 40px;
 }
 
-.info{
-  margin: min(3vw, 40px) 0;
-  font-size: calc(0.5em + 1vw);
+.profileShow img{
+  width: 50px;
+  height: auto;
+}
+
+.profileShow img:hover{
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.closeBtn {
+  position: absolute;
+  right: 50px;
+  top: 15px;
+  font-size: 2.5em;
+}
+
+.closeBtn:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.container{
+  position: fixed;
+  right: 0;
+  width: 360px;
+  height: 100%;
+}
+
+.Split {
+  background: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  -webkit-align-self: flex-end;
+  align-self: flex-end;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.2em;
+  margin-top: auto;
+  margin-bottom: 25px;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+.Split p {
+  margin: 10px;
+  padding: 0 5px;
+  display: inline-block;
+}
+
+.Split p:hover {
+  cursor: pointer;
+  opacity: 0.4;
+}
+
+.NameCompetition{
+  width: 200px;
+  text-align: center;
+}
+
+.highlight {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+
+.highlight:hover {
+  color: #fff;
+  transition: color .2s ease;
+}
+
+.spacing {
+  position: absolute;
+  bottom: -90px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  flex-grow: 1;
+  height: 120px;
+  font-weight: 300;
+  text-align: center;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.65)
+}
+
+.input-line:focus {
+  outline: none;
+  border-color: #fff;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+.ghost-round {
+  cursor: pointer;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  -webkit-align-self: flex-end;
+  align-self: flex-end;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 2.5em;
+  margin-top: auto;
+  margin-bottom: 25px;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+.ghost-round:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+.input-line {
+  background: none;
+  margin-bottom: 10px;
+  line-height: 2.4em;
+  color: #fff;
+  font-weight: 300;
+  letter-spacing: 0.02rem;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+.full-width {
   width: 100%;
 }
 
-.info span{
-  margin-left: 10px;
-  font-size: calc(0.2em + 1vw);
+.input-fields {
+  margin-top: 25px;
 }
 
-.Split{
+.content {
+  padding-left: 25px;
+  padding-right: 25px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: space-between;
+  -webkit-flex-flow: column;
+  flex-flow: column;
+  z-index: 5;
+}
+
+.welcome {
+  font-weight: 200;
+  margin-top: 75px;
   text-align: center;
-  background-color: #ECF0F1;
-  border: 2px solid transparent;
-  border-radius: 20px;
-  padding: 10px;
-  transition: border .5s;
-  margin-bottom: min(3vw, 40px);
+  font-size: 2rem;
+  letter-spacing: 0.05rem;
 }
 
-.Split:hover {
-  border: 2px solid var(--color-main);
-  box-shadow: none;
+.subtitle {
+  margin-top: 20px;
+  text-align: center;
+  line-height: 1em;
+  font-weight: 100;
+  letter-spacing: 0.02rem;
 }
 
-.Split p{
-  margin: 0;
+.menu {
+  background: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 50px;
 }
 
-.NameCompetition {
-  width: 90%
+.window {
+  z-index: 100;
+  color: #fff;
+  position: relative;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: column;
+  flex-flow: column;
+  box-shadow: 0px 15px 50px 10px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  height: 100%;
+  width: 360px;
+  background: #fff;
 }
 
-.Split p:hover{
-  opacity: 0.7;
-  cursor: pointer;
+.overlay {
+  background: -webkit-linear-gradient(var(--color-main), var(--color-main-second));
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  opacity: 0.85;
+  filter: alpha(opacity=85);
+  height: 100%;
+  position: absolute;
+  width: 360px;
+  z-index: 1;
+}
+
+.bold-line {
+  background: #e7e7e7;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  margin: auto;
+  width: 100%;
+  height: 360px;
+  z-index: 1;
+  opacity:0.1;
+  background-size:cover;
 }
 
 .profileBtn{
   position: absolute;
-  display: flex;
-  justify-content: space-between;
-  text-align: center;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
+  width: 300px;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 0);
 }
 
-.app-down{
-  font-size: 0.5em;
-  opacity: 0.9;
-}
-
-.app-down:hover{
-  opacity: 0.6;
-}
-
-@media screen and (max-width: 1000px) {
-  .AuthFormTitle{
-    right: 0;
-    width: 40%;
+@media (max-width: 700px) {
+  .window {
+    width: 100%;
+    height: 100%;
   }
-  .profile{
-    right: 0;
-    width: 60vw;
+  .overlay {
+    width: 100%;
+    height: 100%;
   }
-  .info{
-    margin: 35px 0;
-    font-size: 15px;
+  .container {
+    width: 100%;
+    height: 100%;
   }
-  .info span{
-    font-size: 15px;
-  }
-
 }
 
 </style>

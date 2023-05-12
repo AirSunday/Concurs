@@ -51,21 +51,8 @@ export default {
       image: '',
       imageUrl: '',
       file: null,
+      model: null,
     }
-  },
-  props: {
-    model: {
-      type: Object,
-      required: true
-    },
-  },
-  created() {
-    this.modelId = this.model.id;
-    this.name = this.model.name;
-    this.view = this.model.view;
-    this.text = this.model.text;
-    this.scale = this.model.scale;
-    this.imageUrl = this.model.image;
   },
   methods: {
     AddAlert(mess){

@@ -144,7 +144,44 @@ exports.approvalJudge = (req, res) => {
 }
 
 exports.getCompetition = (req, res) => {
-    Competition.findAll().then((data) => {
+    const dateNow = new Date();
+    Competition.findAll({
+        where: sequelize.literal(`"dateend" >= '${dateNow.toISOString()}'`)
+    }).then((data) => {
+        const promises = data.map(competition => {
+            return Organizer.findOne({ where: { id: competition.dataValues.organizer_id } })
+                .then(organizer => {
+                    return Person.findOne({ where: { id: organizer.dataValues.person_id } })
+                        .then(person => {
+                            return {
+                                id: competition.dataValues.id,
+                                name: competition.dataValues.name,
+                                minitext: competition.dataValues.minitext,
+                                datestart: competition.dataValues.datestart,
+                                dateend: competition.dataValues.dateend,
+                                image_path: competition.dataValues.image,
+                                fileDop: competition.dataValues.fileDop,
+                                organizer_name: person.dataValues.name
+                            };
+                        });
+                });
+        });
+        return Promise.all(promises);
+    }).then(response => {
+        res.status(200).send(response);
+    }).catch(err => {
+        res.status(500).send({
+            message: "Error sending competition",
+            error: err
+        });
+    });
+}
+
+exports.getCompetitionEnd = (req, res) => {
+    const dateNow = new Date();
+    Competition.findAll({
+        where: sequelize.literal(`"dateend" < '${dateNow.toISOString()}'`)
+    }).then((data) => {
         const promises = data.map(competition => {
             return Organizer.findOne({ where: { id: competition.dataValues.organizer_id } })
                 .then(organizer => {
@@ -454,4 +491,15 @@ exports.getWinner = async (req, res) => {
             error: err
         });
 }
+}
+
+exports.getCriteria = (req, res) => {
+    const competitionId = req.body.competitionId;
+    Criteria.findAll({where: {competitiondbId: competitionId}})
+        .then(criteria => {
+            res.status(200).send(criteria);
+        })
+        .catch(() => {
+            res.status(500).send('Error sending criteria')
+        })
 }

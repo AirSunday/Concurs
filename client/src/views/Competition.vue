@@ -1,17 +1,14 @@
 <template>
   <AuthForm/>
-  <div class="MainScreen">
-    <div class="GoToHome" @click="$router.push('/')">
-      &#8962;
-    </div>
+  <div class="competitions">
+    <div class="spaceEmpty"></div>
     <div class="btnCopmetition" v-if="role === 'user' && !(month <= 0 && day <= 0)">
-      <AddModel/>
       <button @click="SendRequestJudge">Стать судьей</button>
+      <button @click="$router.push('/add/model/' + $route.params.id)">Отправить модель</button>
     </div>
     <div class="btnCopmetition" v-if="role === 'not approval judge' || role === 'approval judge'">
       <button @click="DeleteRequestJudge">Отказаться от судьейства</button>
     </div>
-    <div class="spaceEmpty"></div>
     <div class="CardTitle">
       <a v-if="fileUrl !== ''" class="DownloadFile" :href="fileUrl" download>
         <div>
@@ -63,28 +60,30 @@
       </div>
     </div>
     <div class="menegerCompetitionBtn" v-if="role === 'organizer' || role === 'admin'">
-      <EditCompetition/>
       <button @click="DeleteCompetition">Удалить Конкурс</button>
+      <button @click="$router.push('/edit/competition/' + $route.params.id)">Изменить Конкурс</button>
     </div>
-    <div v-for="(mod, key) in model" :key="key">
-      <ModelCard :model="mod" :role="role" :criterias="criterias" :rang="key+1"/>
+    <div class="modelList">
+      <div class="model" v-for="(mod, key) in model" :key="key">
+        <ModelCard :model="mod" :rang="key+1" :role="role"/>
+      </div>
     </div>
   </div>
+
+  <div class="spaceEmpty"></div>
   <AlertMessages ref="AddAlertMess"/>
 </template>
 
 <script>
 import AuthForm from "@/components/AuthForm";
 import Concurs from "@/services/Concurs";
-import EditCompetition from "@/components/EditCompetition";
 import AlertMessages from "@/components/AlertMessages";
 import ModelCard from "@/components/ModelCard";
-import AddModel from "@/components/AddModel";
 import path from "@/services/path";
 
 export default {
   name: "CompetitionPage",
-  components: {AuthForm, EditCompetition, AlertMessages, ModelCard, AddModel},
+  components: {AuthForm, AlertMessages, ModelCard},
   data() {
     return {
       name: '',
@@ -176,7 +175,7 @@ export default {
         competitionId: this.$route.params.id,
         organizerId: this.organizer_id,
       }).then(() => {
-        this.$router.push('/');
+        this.$router.push('/competition');
       })
     },
     SendRequestJudge(){
@@ -263,6 +262,36 @@ export default {
   opacity: 0.9;
 }
 
+.modelList{
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+  width: calc(100% - 50px);
+  margin: 0 20px;
+}
+
+.model{
+  width: 380px;
+  height: 530px;
+}
+
+@media (max-width: 800px) {
+  .model {
+    width: 230px;
+    height: 320px;
+  }
+}
+
+.competitions{
+  width: calc(100vw - 360px);
+}
+
+@media (max-width: 1000px) {
+  .competitions{
+    width: calc(100vw - 20px);
+  }
+}
+
 .MainScreen{
   box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
   position: absolute;
@@ -324,28 +353,34 @@ export default {
 }
 
 .spaceEmpty {
-  height: 12vh;
+  height: 80px;
   width: 100px;
 }
 
 .menegerCompetitionBtn{
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  text-align: center;
+  width: calc(100% - 50px);
+  margin: 0 20px;
+  transition: all 0.1s ease-in-out;
+  border-radius: 25px;
 }
 
 .menegerCompetitionBtn button{
-  margin-bottom: 10px;
-  border: 2px solid transparent;
-  border-radius: 20px;
-  background: var(--color-main);
-  color: #ffffff;
-  font-size: calc(0.5em + 1vw);
-  line-height: 25px;
-  padding: 0.5vw 1vw;
-  text-align: center;
-  transition: 0.25s;
-  display: block;
+  cursor: pointer;
+  margin: 10px;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  -webkit-align-self: flex-end;
+  align-self: flex-end;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 2.5em;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
   width: 35%;
 }
 
@@ -354,30 +389,30 @@ export default {
 }
 
 .btnCopmetition {
-  position: absolute;
-  left: 45px;
-  width: 60%;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  width: calc(100% - 50px);
+  margin: 20px 20px;
+  transition: all 0.1s ease-in-out;
+  border-radius: 25px;
 }
 
 .btnCopmetition button {
-  margin-bottom: 10px;
-  margin-left: 3vw;
-  border: 2px solid transparent;
-  border-radius: 20px;
-  background: var(--color-main);
-  color: #ffffff;
-  font-size: calc(0.5em + 1vw);
-  line-height: 25px;
-  padding: 0.5vw 1vw;
-  text-align: right;
-  text-decoration: none;
-  text-shadow: none;
-  box-shadow: none;
-  transition: 0.25s;
-  display: block;
-  width: 50%;
-  left: calc((100vw - 1058px) / 2);
-  top: 20px;
+  cursor: pointer;
+  margin: 10px;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  -webkit-align-self: flex-end;
+  align-self: flex-end;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 2.5em;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+  width: 35%;
 }
 
 .btnCopmetition button:hover {
@@ -386,13 +421,14 @@ export default {
 
 @media screen and (max-width: 1000px) {
   .btnCopmetition button{
+    font-size: 14px;
     left: 0;
     width: 50%;
   }
-
-  .btnCopmetition {
-    left: 55px;
-    width: 70%;
+  .menegerCompetitionBtn button{
+    font-size: 14px;
+    left: 0;
+    width: 50%;
   }
 }
 
@@ -416,29 +452,32 @@ export default {
   word-wrap: break-word;
   text-align: right;
   margin: 10px 10px;
-  font-size: min(calc(1.5em + 1vw), 35px);
-  color: transparent;
-  -webkit-text-stroke: 1px #222222;
+  font-size: min(calc(1.3em + 1vw), 35px);
+  font-weight: 200;
+  letter-spacing: 0.05rem;
 }
 
 .CardTitle{
   position: relative;
   display: grid;
-  border-radius: 20px;
   grid-template-columns: 5fr 5fr;
-  width: 100%;
+  width: calc(100% - 50px);
+  margin: 0 20px;
   height: 100%;
-  background: #fff;
-  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
+  border: 3px solid transparent;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  box-shadow: inset 0px 0px 0px 100vw #fff;
+  transition: all 0.1s ease-in-out;
 }
 
 .fullText{
   text-align: justify;
-  border-radius: 20px;
-  width: 100%;
-  margin: 10px;
-  background: #fff;
-  box-shadow: 1px 1px 25px 3px rgba(0,0,0,.3);
+  width: calc(100% - 50px);
+  margin: 10px 20px;
+  border: 3px solid transparent;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  box-shadow: inset 0px 0px 0px 100vw #fff;
+  transition: all 0.1s ease-in-out;
 }
 
 .fullText p{
@@ -447,7 +486,6 @@ export default {
 }
 
 .right {
-  border-radius: 20px 0 0 20px;
   position: relative;
   overflow: hidden;
   clip-path: polygon(0 0, 80% 0%, 100% 100%, 0% 100%);
@@ -457,13 +495,29 @@ export default {
 }
 
 .right img {
-  border-radius: 20px 0 0 20px;
   height: 400px;
+}
+
+@media screen and (max-width: 1200px) {
+  .TitleCompetition{
+    font-size: 21px;
+    font-weight: 150;
+    letter-spacing: 0;
+  }
 }
 
 @media screen and (max-width: 500px) {
   .DownloadFile{
     font-size: 10px;
+  }
+  .TitleCompetition{
+    font-size: 18px;
+  }
+  .CardTitle {
+    grid-template-columns: 2fr 10fr;
+  }
+  .right {
+    width: 20vw;
   }
 }
 
