@@ -20,12 +20,16 @@ export default {
   position: fixed;
   top: 20px;
   left: 40px;
+  width: 50px;
+  height: 50px;
   z-index: 7;
+  background: rgba(255, 255, 255, 0.58);
+  border-radius: 50px;
 }
 
 .goPrev img{
   width: 50px;
-  height: auto;
+  height: 50px;
 }
 
 .goPrev img:hover{

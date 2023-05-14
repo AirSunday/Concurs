@@ -233,13 +233,18 @@ button:focus {
 
 .profileShow{
   position: fixed;
+  width: 50px;
+  height: 50px;
+  z-index: 7;
+  background: rgba(255, 255, 255, 0.58);
+  border-radius: 50px;
   top: 20px;
   right: 40px;
 }
 
 .profileShow img{
   width: 50px;
-  height: auto;
+  height: 50px;
 }
 
 .profileShow img:hover{
@@ -407,6 +412,7 @@ button:focus {
 
 .subtitle {
   margin-top: 20px;
+  margin-bottom: 10px;
   text-align: center;
   line-height: 1em;
   font-weight: 100;

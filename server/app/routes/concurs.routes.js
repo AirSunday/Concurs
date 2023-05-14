@@ -56,11 +56,13 @@ module.exports = (app) => {
   //
   router.post("/competition/getCriteria", competition.getCriteria);
   //
-  router.post("/model/create", upload.single('filedata'), model.create);
+  router.post("/model/create", upload.array('files', 5), model.create);
   //
-  router.post("/model/update", upload.single('filedata'), model.update);
+  router.post("/model/update", upload.array('files', 5), model.update);
   //
   router.post("/model/sendScore", model.sendScore);
+  //
+  router.post("/model/GetModelImages", model.GetModelImages);
   //
   router.post("/model/getScore", model.getScore);
   //

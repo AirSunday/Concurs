@@ -1,6 +1,7 @@
 const db = require("../models").db;
 var sequelize = require("sequelize");
 const Person = db.persondbs;
+const Image = db.imagedbs;
 const Judge = db.judgedbs
 const Criteria = db.criteriadbs;
 const Model = db.modeldbs;
@@ -302,7 +303,7 @@ exports.getOneCompetition = async (req, res) => {
             const person = await Person.findOne({ where: { id: participant.person_id } });
             return { id: model.id, person_name: person.name,
                      person_id: person.id, name: model.name, view: model.view,
-                     scale: model.scale, text: model.text, image: model.image,
+                     scale: model.scale, text: model.text,
                      participant: model.participant, score: model.score,
                      dateupload: model.dateupload, competitiondbId: model.competitiondbId};
         }));
@@ -318,6 +319,7 @@ exports.getOneCompetition = async (req, res) => {
             image_path: competition.image,
             fileDop: competition.fileDop,
             organizer_name: person.name,
+            imageUrlPerson: person.photo,
             organizer_id: organizer.id,
             criterias: criterias,
             judges: usersJudge,
@@ -341,6 +343,17 @@ exports.deleteCompetition = async (req, res) => {
         await Judge.destroy({ where: { competitiondbId: competitionId }});
 
         const models = await Model.findAll({ where: { competitiondbId: competitionId } });
+        await Promise.all(models.map(async (model) => {
+            const images = await Image.findAll({ where: { model: model.id } });
+            await Promise.all(images.map(async (image) => {
+                await fs.unlink("app/uploads/" + image.image, (err) => {
+                    if (err) {
+                        console.error(err);
+                    }
+                });
+            }));
+            await Image.destroy({ where: { model: model.id } });
+        }))
         const participantIds = models.map((model) => model.participant);
         await Participant.destroy({ where: { id: { [Op.in]: participantIds } } });
         await Model.destroy({ where: { competitiondbId: competitionId } });
@@ -373,11 +386,15 @@ exports.deleteModel = async (req, res) => {
         await Score.destroy({where: { model_id: modelId }});
         await Participant.destroy({where: { id: participantId}});
         await Model.destroy({where: { id: modelId }});
-        await fs.unlink("app/uploads/" + req.body.image, (err) => {
-            if (err) {
-                console.error(err);
-            }
-        });
+        const images = await Image.findAll({ where: { model: modelId } });
+        await Promise.all(images.map(async (image) => {
+            await fs.unlink("app/uploads/" + image.image, (err) => {
+                if (err) {
+                    console.error(err);
+                }
+            });
+        }));
+        await Image.destroy({ where: { model: modelId } });
 
         res.status(200).send('Competition successfully deleted');
     } catch (error) {

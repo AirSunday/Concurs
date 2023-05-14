@@ -1,18 +1,18 @@
 <template>
-  <div class="card" @click="$router.push('/competition/' + competition.id)"
+
+  <div class="CardTitle"  @click="$router.push('/competition/' + competition.id)"
        v-on:mouseover="showFullText = true" v-on:mouseleave="showFullText = false">
     <a v-if="fileUrl !== ''" class="DownloadFile" :href="fileUrl" download>
       <div>
         <p>Положение &#129095;</p>
       </div>
     </a>
-    <div class="imgCard">
-      <div class="endWaterMark" v-if="datenow >= dateend"><p>Окончено</p></div>
+    <div class="right">
       <img :src="imageUrl" alt="">
-    </div >
-    <div class="content" v-if="!showFullText">
-      <h2>{{competition.name}}</h2>
-      <div class="downContent">
+    </div>
+    <div class="rightContent" v-show="!showFullText">
+      <p class="TitleCompetition">{{competition.name}}</p>
+      <div class="rightContentDown">
         <p>Категория: {{competition.category}}</p>
         <div v-if="datenow < dateend">
           <p>Старт: {{competition.datestart.split('T')[0]}}</p>
@@ -24,7 +24,7 @@
         </div>
       </div>
     </div>
-    <div class="hideText" v-if="showFullText">
+    <div class="hideText" v-show="showFullText">
       <div class="winners" v-if="datenow >= dateend">
         <div v-for="(winner ,key) in winners" :key="key">
           <p class="rangTitile">&#9733; Место {{key + 1}} &#9733;</p>
@@ -85,6 +85,87 @@ export default {
 
 <style scoped>
 
+.rightContent {
+  position: relative;
+}
+
+.rightContentDown {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.rightContentDown p {
+  margin: 5px;
+  text-align: right;
+  opacity: 0.6;
+}
+
+.TitleCompetition{
+  word-wrap: break-word;
+  text-align: right;
+  margin: 10px 10px;
+  font-size: min(calc(1.3em + 1vw), 35px);
+  font-weight: 100;
+  letter-spacing: 0;
+}
+
+.CardTitle{
+  position: relative;
+  display: grid;
+  grid-template-columns: 5fr 5fr;
+  width: calc(100% - 50px);
+  margin: 0 20px;
+  height: 100%;
+  border: 3px solid transparent;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  box-shadow: inset 0px 0px 0px 100vw #fff;
+  transition: all 0.1s ease-in-out;
+  border-radius: 25px;
+}
+
+.fullText p{
+  font-size: min(calc(0.5em + 1vw), 20px);
+  padding: 0 10px;
+}
+
+.right {
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0 0, 80% 0%, 100% 100%, 0% 100%);
+  object-fit: cover;
+  width: 40vw;
+  height: 40vh;
+}
+
+.right img {
+  height: 100%;
+  border-radius: 21px 0 0 21px;
+}
+
+@media screen and (max-width: 1200px) {
+  .TitleCompetition{
+    font-size: 21px;
+    font-weight: 150;
+    letter-spacing: 0;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .DownloadFile{
+    font-size: 10px;
+  }
+  .TitleCompetition{
+    font-size: 18px;
+  }
+  .CardTitle {
+    grid-template-columns: 2fr 10fr;
+  }
+  .right {
+    width: 20vw;
+  }
+}
+
 .DownloadFile{
   opacity: 0.7;
   z-index: 3;
@@ -107,30 +188,6 @@ export default {
   opacity: 0.9;
 }
 
-.card{
-  position: relative;
-  width: 350px;
-  height: 500px;
-  border: 3px solid transparent;
-  background: linear-gradient(var(--color-main), var(--color-main-second));
-  box-shadow: inset 0px 0px 0px 100vw #fff;
-  border-radius: 25px;
-  transition: all 0.1s ease-in-out;
-}
-
-.card:hover{
-  width: 365px;
-  height: 515px;
-}
-
-
-.content{
-  text-align: justify;
-  width: 350px;
-  height: 300px;
-  position: relative;
-}
-
 .content p {
   margin: 0;
 }
@@ -140,18 +197,11 @@ export default {
   padding: 5px;
 }
 
-.downContent{
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-}
-
 .hideText{
   text-align: justify;
-  width: 340px;
-  height: 300px;
+  margin: 10px;
   padding: 0 5px;
-  font-size: 18px;
+  font-size: calc(0.7em + 1vw);
   transition: transform 0.4s ease-in-out;
 }
 
@@ -163,28 +213,6 @@ export default {
   margin-bottom: 15px;
   text-align: center;
   font-size: 22px;
-}
-
-.imgCard {
-  position: relative;
-  overflow: hidden;
-  height: 200px;
-  border: 2px solid transparent;
-  background: linear-gradient(var(--color-main), var(--color-main-second));
-  box-shadow: inset 0px 0px 0px 100vw #fff;
-  border-radius: 20px 20px 0 0;
-}
-
-.endWaterMark {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(170, 170, 170, 0.55);
-  opacity: 0.9;
-  display: flex;
-  z-index: 5;
-  justify-content: center;
-  align-items: center;
 }
 
 .endWaterMark p{
@@ -201,147 +229,18 @@ export default {
   transition: transform 0.4s ease-in-out;
 }
 
-@media (max-width: 1600px) {
-  .card{
-    width: 450px;
-    height: 500px;
-  }
-  .card:hover{
-    width: 455px;
-    height: 505px;
-  }
-  .content{
-    width: 450px;
-    height: 300px;
-  }
-
+@media (max-width: 1550px) {
   .hideText{
-    width: 450px;
-    height: 500px;
-  }
-
-}
-
-@media (max-width: 1360px) {
-  .card{
-    width: 350px;
-    height: 500px;
-  }
-  .card:hover{
-    width: 365px;
-    height: 515px;
-  }
-  .content{
-    width: 350px;
-    height: 300px;
-  }
-
-  .hideText{
-    width: 340px;
-    height: 300px;
-  }
-
-}
-
-@media (max-width: 1200px) {
-  .card{
-    width: 450px;
-    height: 500px;
-  }
-  .card:hover{
-    width: 455px;
-    height: 505px;
-  }
-  .content{
-    width: 450px;
-    height: 300px;
-  }
-
-  .hideText{
-    width: 450px;
-    height: 500px;
+    font-size: calc(0.3em + 1vw);
   }
 
 }
 
 @media (max-width: 1000px) {
-  .card{
-    width: 350px;
-    height: 500px;
-  }
-  .card:hover{
-    width: 365px;
-    height: 515px;
-  }
-  .content{
-    width: 350px;
-    height: 300px;
-  }
-
   .hideText{
-    width: 340px;
-    height: 300px;
+    font-size: calc(0.7em + 1vw);
   }
 
-}
-
-@media (max-width: 900px) {
-  .card{
-    width: 450px;
-    height: 500px;
-  }
-  .card:hover{
-    width: 455px;
-    height: 505px;
-  }
-  .content{
-    width: 450px;
-    height: 300px;
-  }
-
-  .hideText{
-    width: 450px;
-    height: 500px;
-  }
-
-}
-
-@media (max-width: 850px) {
-
-  .card{
-    width: 200px;
-    height: 350px;
-  }
-  .card:hover{
-    width: 210px;
-    height: 355px;
-  }
-  .rangTitile{
-    font-size: 16px;
-  }
-  .content{
-    width: 200px;
-    height: 250px;
-    font-size: 13px;
-  }
-
-  .content h2 {
-    font-size: 15px;
-  }
-
-  .hideText{
-    width: 190px;
-    height: 100px;
-    font-size: 12px;
-  }
-
-  .imgCard {
-    height: 100px;
-  }
-
-  .imgCard img {
-    height: 100px;
-  }
 }
 
 </style>

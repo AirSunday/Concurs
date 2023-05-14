@@ -15,7 +15,7 @@
                 <input type="password" class='input-line full-width' v-model="Repassword" placeholder="Повторите пароль">
             </div>
 
-          <div class="control-group imgPicker">
+          <div class="control-group imgPicker" v-if="ModeViewAuthForm === 'Регистрация'">
             <input type="file" id="fileUpload" @change="onFileChange" hidden/>
             <button class='ghost-round full-width' @click="chooseFiles()">Выберите картинку</button>
             <p v-if="file">Картинка загружена</p>

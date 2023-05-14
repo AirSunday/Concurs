@@ -18,9 +18,6 @@ module.exports = (sequelize, Sequelize) => {
         text: {
             type: Sequelize.TEXT,
         },
-        image: {
-            type: Sequelize.TEXT,
-        },
         participant: {
             type: Sequelize.INTEGER,
         },

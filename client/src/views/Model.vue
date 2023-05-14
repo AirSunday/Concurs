@@ -1,9 +1,22 @@
 <template>
   <GoPrev :path="'/competition/' + competitionId"/>
   <AuthForm/>
+
+  <div class="backEmpty" v-show="showImages"></div>
+  <div class="imagesShow" v-show="showImages">
+    <p class="closeBtn" @click="showImages = !showImages">&#215;</p>
+    <div class="imageCard">
+      <div class="imageGoTo">
+        <p @click="GoTo(-1)">&#706;</p>
+        <img :src="imagePathTemp" alt="">
+        <p @click="GoTo(1)">&#707;</p>
+      </div>
+    </div>
+  </div>
+
   <div class="competitions">
     <div class="spaceEmpty"></div>
-    <div class="CardTitle">
+    <div class="CardTitle" @click="showImages = !showImages">
       <div v-if="role === 'approval judge'" class="rated" v-bind:class="{ ratedFalse: !rated, ratedTrue: rated}">
         <p v-if="rated">Оценено</p>
         <p v-else>Не оценено</p>
@@ -14,11 +27,17 @@
       <div class="rightContent">
         <p class="TitleCompetition">{{name}}</p>
         <div class="rightContentDown">
-          <p>{{userName}}: Имя участника</p>
-          <p>{{view}}: Вид модели</p>
-          <p>{{scale}}: Масштаб</p>
-          <p>{{score}}%: Оценка</p>
-          <p>{{dateupload.split('T')[0]}}: Дата загрузки</p>
+          <p>Имя участника:</p>
+          <div class="photoProfile">
+            <p>{{userName}}</p>
+            <div v-show="imageUrlPerson !== ''" class="photo">
+              <img :src="imageUrlPerson" alt="">
+            </div>
+          </div>
+          <p>Вид модели: {{view}}</p>
+          <p>Масштаб: {{scale}}</p>
+          <p>Оценка: {{score}}%</p>
+          <p>Дата загрузки: {{dateupload.split('T')[0]}}</p>
         </div>
       </div>
     </div>
@@ -72,6 +91,7 @@ export default {
       scale: '',
       text: '',
       imagePath: '',
+      imagePathTemp: '',
       participant: '',
       score: '',
       dateupload: '',
@@ -81,9 +101,13 @@ export default {
       model: {},
       personIdNow: '',
       image: '',
+      imageUrlPerson: '',
       rated: true,
+      showImages: false,
       scores: [],
       criterias: [],
+      images: [],
+      imagesTemp: 0,
       previousPage: null
     }
   },
@@ -118,6 +142,12 @@ export default {
               this.personIdNow = 0;
             }
           });
+    },
+    GoTo(temp){
+      this.imagesTemp += temp;
+      if(this.imagesTemp < 0) this.imagesTemp = 0;
+      if(this.imagesTemp >= this.images.length) this.imagesTemp = this.images.length - 1;
+      this.imagePathTemp = path.path + "/image/" + this.images[this.imagesTemp].image;
     },
     GetRole(){
       let isAdmin = false;
@@ -207,13 +237,21 @@ export default {
             this.scale = res.data.dataValues.scale;
             this.dateupload = res.data.dataValues.dateupload;
             this.text = res.data.dataValues.text;
-            this.imagePath = path.path + "/image/" + res.data.dataValues.image;
             this.image = res.data.dataValues.image;
             this.score = res.data.dataValues.score;
             this.participant = res.data.dataValues.participant;
             this.userName = res.data.person_name;
             this.personId = res.data.person_id;
             this.competitionId = res.data.dataValues.competitiondbId;
+
+            if(res.data.imageUrlPerson !== '') this.imageUrlPerson = path.path + '/image/' + res.data.imageUrlPerson;
+            else this.imageUrlPerson = '';
+
+            Concurs.GetModelImages({modelId: this.modelId}).then(images => {
+              this.imagePath = path.path + "/image/" + images.data[0].image;
+              this.imagePathTemp = this.imagePath;
+              this.images = images.data;
+            })
 
             this.model = {
               modelId: this.modelId,
@@ -223,8 +261,6 @@ export default {
               scale: this.scale,
               imageUrl: this.imagePath,
             }
-
-
 
             this.GetRole();
           })
@@ -246,6 +282,87 @@ export default {
 </script>
 
 <style scoped>
+
+
+.photo{
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  width: 50px;
+  height: 50px;
+}
+
+.photoProfile img{
+  border-radius: 25px;
+  width: 50px; /* задаем ширину */
+  height: 50px; /* задаем высоту */
+  object-fit: cover; /* масштабируем изображение */
+  object-position: center center; /* выравниваем по центру */
+}
+
+.photoProfile{
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.imageGoTo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.imageGoTo p {
+  color: #fff;
+  margin: 30px;
+  font-size: 100px;
+}
+
+.imageGoTo p:hover {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.imageGoTo img {
+  width: 40vw;
+  height: auto;
+}
+
+.closeBtn{
+  position: fixed;
+  color: #fff;
+  font-size: 100px;
+  z-index: 9;
+  top: 40px;
+  right: 40px;
+  margin: 0;
+}
+
+.closeBtn:hover {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.imagesShow{
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  z-index: 8;
+  height: 100%;
+}
+
+.backEmpty{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.4;
+  z-index: 8;
+}
 
 .ratedClass{
   text-align: justify;
@@ -347,6 +464,12 @@ export default {
   background: linear-gradient(var(--color-main), var(--color-main-second));
   box-shadow: inset 0px 0px 0px 100vw #fff;
   transition: all 0.1s ease-in-out;
+  border-radius: 25px;
+}
+
+.CardTitle:hover{
+  cursor: pointer;
+  opacity: 0.6;
 }
 
 .fullText{
@@ -357,6 +480,7 @@ export default {
   background: linear-gradient(var(--color-main), var(--color-main-second));
   box-shadow: inset 0px 0px 0px 100vw #fff;
   transition: all 0.1s ease-in-out;
+  border-radius: 25px;
 }
 
 .fullText p{
@@ -375,6 +499,7 @@ export default {
 
 .right img {
   height: 400px;
+  border-radius: 21px 0 0 21px;
 }
 
 

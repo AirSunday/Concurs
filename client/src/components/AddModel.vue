@@ -23,9 +23,13 @@
     </div>
 
     <div class="control-group imgPicker">
-      <input type="file" id="fileUpload" @change="onFileChange" hidden/>
+      <input type="file" id="files" ref="files"  multiple v-on:change="handleFilesUpload()" hidden/>
       <button class="input-file-btn" @click="chooseFiles()">Выберите картинку</button>
-      <p v-if="file">Картинка загружена</p>
+      <div class="large-12 medium-12 small-12 cell">
+        <div v-for="(file, key) in files" :key="key" class="file-listing">
+          {{ file.name }} <span class="remove-file" v-on:click="removeFile( key )">Remove</span>
+        </div>
+      </div>
     </div>
     <button class="btn-second" @click.prevent="AddCompetition(); reloadPage();">Отправить модель</button>
   </div>
@@ -47,7 +51,7 @@ export default {
       scale: '',
       text: '',
       image: '',
-      file: null,
+      files: [],
     }
   },
   created() {
@@ -64,14 +68,23 @@ export default {
       this.fulltext = '';
       this.datestart = '';
       this.dateend = '';
-      this.file = null;
+      this.files = [];
       this.criterias =  [{name: '', maxscore: ''}];
     },
     chooseFiles: function() {
-      document.getElementById("fileUpload").click()
+      document.getElementById("files").click()
     },
     onFileChange(e) {
-      this.file = e.target.files[0];
+      this.files = e.target.files[0];
+    },
+    handleFilesUpload(){
+      let uploadedFiles = this.$refs.files.files;
+      for( var i = 0; i < uploadedFiles.length; i++ ){
+        this.files.push( uploadedFiles[i] );
+      }
+    },
+    removeFile( key ){
+      this.files.splice( key, 1 );
     },
     CheckSession() {
       Concurs.Authentication()
@@ -96,13 +109,16 @@ export default {
           this.view === ''    ||
           this.scale === ''   ||
           this.text === ''    ||
-          this.file === null  ) {
+          this.files === []  ) {
         this.AddAlert({ status: false, message: "Заполните все поля" });
         return;
       }
       this.ModView = !this.ModView;
       let formData = new FormData();
-      formData.append("filedata", this.file);
+      for( var i = 0; i < this.files.length; i++ ){
+        let file = this.files[i];
+        formData.append('files[' + i + ']', file);
+      }
       formData.append("name", this.name);
       formData.append("view", this.view);
       formData.append("scale", this.scale);

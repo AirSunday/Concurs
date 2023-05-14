@@ -166,6 +166,13 @@ class Concurs {
       }
     });
   }
+  GetModelImages(data) {
+    return http.post(`/model/GetModelImages`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   createModel(data) {
     return http.post(`/model/create`, data, {
       headers: {

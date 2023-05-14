@@ -2,6 +2,7 @@ const db = require("../models").db;
 var sequelize = require("sequelize");
 const fs = require("fs");
 const Model = db.modeldbs;
+const Image = db.imagedbs;
 const Participant = db.participantdbs;
 const Competition = db.competitiondbs;
 const Score = db.scoredbs;
@@ -43,77 +44,87 @@ exports.Authentication = (req, res) => {
     });
 };
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
+    try {
+        const filedata = req.files;
+        if (!filedata)
+            res.send("Ошибка при загрузке файла");
 
-    const filedata = req.file;
-    if(!filedata)
-        res.send("Ошибка при загрузке файла");
+        const userId = await FindSession(req);
+        const participant = await CreateParticipant(userId);
+        const today = new Date();
+        const model = await Model.create({
+            participant: participant.id,
+            name: req.body.name,
+            view: req.body.view,
+            scale: req.body.scale,
+            text: req.body.text,
+            score: 0,
+            dateupload: today,
+        });
+        await Promise.all(filedata.map(async (image) => {
+            await Image.create({
+                model: model.id,
+                image: image.filename
+            })
+        }))
+        const competition = await Competition.findByPk(req.body.competitionId);
+        await competition.addModel(model);
 
-    FindSession(req).then((userId) => {
-        CreateParticipant(userId).then((participant) => {
-            const today = new Date();
-            Model.create({
-                participant: participant.id,
-                name: req.body.name,
-                view: req.body.view,
-                scale: req.body.scale,
-                text: req.body.text,
-                image: filedata.filename,
-                score: 0,
-                dateupload: today,
-            }).then((model) => {
-                Competition.findByPk(req.body.competitionId)
-                    .then((competition) => {
-                        competition.addModel(model).then(() => {
-                            res.status(200).send({
-                                message: "creat Model",
-                            });
-                        }).catch(() => {
-                            res.status(500).send({
-                                message: "Error creating Model",
-                            });
-                        });
-                    })
-            }).catch(() => {
-                res.status(500).send({
-                    message: "Error creating Model",
-                });
-            });
-        })
-    });
+        res.status(200).send({
+            message: "creat Model",
+        });
+    }
+    catch{
+        res.status(500).send({
+            message: "Error creating Model",
+        });
+    }
 };
 
 exports.update = async (req, res) => {
-    const filedata = req.file;
-    const modelId = req.body.modelId;
-    if(filedata) {
-        await fs.unlink("app/uploads/" + req.body.imageUrl, (err) => {
-            if (err) {
-                console.error(err);
+    try {
+        const filedata = req.files;
+        const modelId = req.body.modelId;
+        if(filedata) {
+            const images = await Image.findAll({ where: { model: modelId } });
+            await Promise.all(images.map(async (image) => {
+                await fs.unlink("app/uploads/" + image.image, (err) => {
+                    if (err) {
+                        console.error(err);
+                    }
+                });
+            }));
+            await Image.destroy({ where: { model: modelId } });
+            await Promise.all(filedata.map(async (image) => {
+                console.log(image);
+                await Image.create({
+                    model: modelId,
+                    image: image.filename
+                })
+            }))
+        }
+
+        await Model.update({
+            name: req.body.name,
+            view: req.body.view,
+            text: req.body.text,
+            scale: req.body.scale,
+        }, {
+            where: {
+                id: modelId,
             }
+        })
+
+        res.status(200).send({
+            message: "update Model",
         });
     }
-
-    let filename = '';
-    if(!filedata) filename = req.body.imageUrl;
-    else filename = req.file.filename;
-    Model.update({
-        name: req.body.name,
-        view: req.body.view,
-        text: req.body.text,
-        scale: req.body.scale,
-        image: filename,
-    }, {
-        where: {
-            id: modelId,
-        }
-    }).then(() => {
-        res.status(200).send("update competition");
-    }).catch((err) => {
+    catch{
         res.status(500).send({
-            message: "Error updating competition",
+            message: "Error updating Model",
         });
-    })
+    }
 };
 
 exports.sendScore = async (req, res) => {
@@ -204,16 +215,32 @@ exports.getOneModel = async (req, res) => {
         const model = await Model.findOne({where: {id: req.body.id}});
         const participant = await Participant.findOne({where: {id: model.participant}});
         const person = await Person.findOne({where: {id: participant.person_id}});
+        const images = await Image.findAll({where: {model: req.body.id }})
 
         res.status(200).send({
             ...model,
             person_id: person.id,
             person_name: person.name,
+            imageUrlPerson: person.photo,
+            ...images,
         });
     } catch (err) {
         res.status(500).send({
             message: "Error sending competition",
             error: err
+        });
+    }
+}
+
+exports.GetModelImages = async (req, res) => {
+    try {
+        const modelId = req.body.modelId;
+        const images = await Image.findAll({where: {model: modelId}});
+        res.status(200).send(images);
+    }
+    catch{
+        res.status(500).send({
+            message: "Error sending image Model",
         });
     }
 }

@@ -39,7 +39,7 @@ export default {
   bottom: 0;
   right: 2px;
   width: 100%;
-  z-index: 5;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: flex-end;

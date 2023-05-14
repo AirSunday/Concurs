@@ -25,5 +25,6 @@ db.participantdbs = require("./participant.model.js")(sequelize, Sequelize);
 db.persondbs = require("./person.model.js")(sequelize, Sequelize);
 db.sessiondbs = require("./session.model.js")(sequelize, Sequelize);
 db.scoredbs = require("./score.model.js")(sequelize, Sequelize);
+db.imagedbs = require("./image.model.js")(sequelize, Sequelize);
 
 module.exports = { sequelize, db };

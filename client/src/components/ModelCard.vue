@@ -82,9 +82,12 @@ export default {
       this.scale = this.model.scale;
       this.dateupload = this.model.dateupload;
       this.text = this.model.text;
-      this.imagePath = path.path + "/image/" + this.model.image;
       this.score = this.model.score;
       this.userName = this.model.person_name;
+
+      Concurs.GetModelImages({modelId: this.model.id}).then(images => {
+        this.imagePath = path.path + "/image/" + images.data[0].image;
+      })
     },
     CheckSession() {
       Concurs.Authentication()

@@ -23,8 +23,15 @@
       <div class="rightContent">
         <p class="TitleCompetition">{{name}}</p>
         <div class="rightContentDown">
+
+          <p>Организатор:</p>
+          <div class="photoProfile">
+            <p>{{organizer_name}}</p>
+            <div v-show="imageUrlPerson !== ''" class="photo">
+              <img :src="imageUrlPerson" alt="">
+            </div>
+          </div>
           <p>Категория: {{category}}</p>
-          <p>Организатор: {{organizer_name}}</p>
           <p v-if="month > 0">Осталось: {{month}} мес. {{day}} дн.</p>
           <p v-if="month <= 0 && day <= 0">Конкурс закончился</p>
           <p v-if="month <= 0 && day > 0">Осталось: {{day}} дн.</p>
@@ -101,6 +108,7 @@ export default {
       dateend: '',
       criterias: [],
       imageUrl: '',
+      imageUrlPerson: '',
       organizer_name: '',
       organizer_id: 0,
       judge: [],
@@ -144,6 +152,8 @@ export default {
           this.imageUrl = path.path + '/image/' + res.data.image_path;
           this.organizer_id = res.data.organizer_id;
           this.organizer_name = res.data.organizer_name;
+          if(res.data.imageUrlPerson !== '') this.imageUrlPerson = path.path + '/image/' + res.data.imageUrlPerson;
+          else this.imageUrlPerson = '';
           this.judge = res.data.judges;
           this.countApprovalJudge = this.judge.filter(judge => judge.approval).length;
           this.model = res.data.models;
@@ -256,6 +266,30 @@ export default {
 </script>
 
 <style scoped>
+
+.photo{
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  width: 50px;
+  height: 50px;
+}
+
+.photoProfile img{
+  border-radius: 25px;
+  width: 50px; /* задаем ширину */
+  height: 50px; /* задаем высоту */
+  object-fit: cover; /* масштабируем изображение */
+  object-position: center center; /* выравниваем по центру */
+}
+
+.photoProfile{
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
 
 .DownloadFile{
   opacity: 0.7;

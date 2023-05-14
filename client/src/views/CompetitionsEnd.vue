@@ -93,6 +93,7 @@ export default {
 }
 
 .select-line {
+  padding-left: 10px;
   position: fixed;
   top: 20px;
   left: 100px;

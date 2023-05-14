@@ -72,17 +72,11 @@ export default {
 
 <style scoped>
 
-.list{
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-}
-
 .listCard {
+  margin: 10px 0;
   display: flex;
   justify-content: center;
-  width: 410px;
-  height: 530px;
+  width: calc(100vw - 360px);
 }
 
 .emptySpace{
@@ -95,6 +89,7 @@ export default {
 }
 
 .select-line {
+  padding-left: 10px;
   position: fixed;
   top: 20px;
   left: 100px;
@@ -123,53 +118,9 @@ export default {
   background-color: var(--color-main);
 }
 
-
-@media (max-width: 1600px) {
-  .listCard {
-    width: 500px;
-  }
-}
-
-@media (max-width: 1360px) {
-  .listCard {
-    width: 400px;
-  }
-}
-
-@media (max-width: 1200px) {
-  .listCard {
-    width: 500px;
-  }
-}
-
 @media (max-width: 1000px) {
   .listCard {
-    width: 450px;
-  }
-}
-
-@media (max-width: 900px) {
-  .listCard {
-    width: 500px;
-  }
-}
-
-@media (max-width: 1000px) {
-  .competitions{
-    width: calc(100vw - 20px);
-  }
-}
-
-@media (max-width: 850px) {
-  .listCard {
-    width: 230px;
-    height: 370px;
-  }
-}
-
-@media (max-width: 450px) {
-  .select-line {
-    width: 100px;
+    width: calc(100vw);
   }
 }
 

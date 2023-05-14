@@ -11,9 +11,13 @@
           <textarea class='textarea-line full-width' id="message" name="message" rows="4" cols="50" maxlength="600" v-model="text" placeholder="Описание"></textarea>
 
           <div class="control-group imgPicker">
-            <input type="file" id="fileUpload" @change="onFileChange" hidden/>
+            <input type="file" id="files" ref="files"  multiple v-on:change="handleFilesUpload()" hidden/>
             <button class='ghost-round full-width' @click="chooseFiles()">Выберите картинку</button>
-            <p v-if="file">Картинка загружена</p>
+            <div class="large-12 medium-12 small-12 cell">
+              <div v-for="(file, key) in files" :key="key" class="file-listing">
+                {{ file.name }} <span class="remove-file" v-on:click="removeFile( key )">&#128465;</span>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -44,7 +48,7 @@ export default {
       scale: '',
       text: '',
       image: '',
-      file: null,
+      files: [],
       previousPage: null
     }
   },
@@ -79,12 +83,20 @@ export default {
     },
     goToPreviousPage(){
       this.$router.push(this.previousPage || "/model/" + this.$route.params.id);
-    },
-    chooseFiles: function() {
-      document.getElementById("fileUpload").click()
+    },chooseFiles: function() {
+      document.getElementById("files").click()
     },
     onFileChange(e) {
       this.file = e.target.files[0];
+    },
+    handleFilesUpload(){
+      let uploadedFiles = this.$refs.files.files;
+      for( var i = 0; i < uploadedFiles.length; i++ ){
+        this.files.push( uploadedFiles[i] );
+      }
+    },
+    removeFile( key ){
+      this.files.splice( key, 1 );
     },
     CheckSession() {
       Concurs.Authentication()
@@ -109,7 +121,12 @@ export default {
         return;
       }
       let formData = new FormData();
-      if(this.file !== null) formData.append("filedata", this.file);
+      if(this.files !== []) {
+        for( var i = 0; i < this.files.length; i++ ){
+          let file = this.files[i];
+          formData.append('files', file);
+        }
+      }
       formData.append("imageUrl", this.imageUrl);
       formData.append("modelId", this.modelId);
       formData.append("name", this.name);
