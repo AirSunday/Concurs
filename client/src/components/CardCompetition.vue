@@ -13,7 +13,7 @@
     <div class="content" v-if="!showFullText">
       <h2>{{competition.name}}</h2>
       <div class="downContent">
-        <p>Категория: Моделирование</p>
+        <p>Категория: {{competition.category}}</p>
         <div v-if="datenow < dateend">
           <p>Старт: {{competition.datestart.split('T')[0]}}</p>
           <p>Конец: {{competition.dateend.split('T')[0]}}</p>
@@ -201,22 +201,127 @@ export default {
   transition: transform 0.4s ease-in-out;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1600px) {
+  .card{
+    width: 450px;
+    height: 500px;
+  }
+  .card:hover{
+    width: 455px;
+    height: 505px;
+  }
+  .content{
+    width: 450px;
+    height: 300px;
+  }
+
+  .hideText{
+    width: 450px;
+    height: 500px;
+  }
+
+}
+
+@media (max-width: 1360px) {
+  .card{
+    width: 350px;
+    height: 500px;
+  }
+  .card:hover{
+    width: 365px;
+    height: 515px;
+  }
+  .content{
+    width: 350px;
+    height: 300px;
+  }
+
+  .hideText{
+    width: 340px;
+    height: 300px;
+  }
+
+}
+
+@media (max-width: 1200px) {
+  .card{
+    width: 450px;
+    height: 500px;
+  }
+  .card:hover{
+    width: 455px;
+    height: 505px;
+  }
+  .content{
+    width: 450px;
+    height: 300px;
+  }
+
+  .hideText{
+    width: 450px;
+    height: 500px;
+  }
+
+}
+
+@media (max-width: 1000px) {
+  .card{
+    width: 350px;
+    height: 500px;
+  }
+  .card:hover{
+    width: 365px;
+    height: 515px;
+  }
+  .content{
+    width: 350px;
+    height: 300px;
+  }
+
+  .hideText{
+    width: 340px;
+    height: 300px;
+  }
+
+}
+
+@media (max-width: 900px) {
+  .card{
+    width: 450px;
+    height: 500px;
+  }
+  .card:hover{
+    width: 455px;
+    height: 505px;
+  }
+  .content{
+    width: 450px;
+    height: 300px;
+  }
+
+  .hideText{
+    width: 450px;
+    height: 500px;
+  }
+
+}
+
+@media (max-width: 850px) {
 
   .card{
     width: 200px;
-    height: 300px;
+    height: 350px;
   }
   .card:hover{
     width: 210px;
-    height: 310px;
+    height: 355px;
   }
   .rangTitile{
     font-size: 16px;
   }
   .content{
     width: 200px;
-    height: 200px;
+    height: 250px;
     font-size: 13px;
   }
 

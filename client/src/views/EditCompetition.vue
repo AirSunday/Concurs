@@ -6,6 +6,17 @@
         <div class='welcome'>Изменение конкурса</div>
         <div class='input-fields'>
           <input type="text" maxlength="100" class='input-line full-width' v-model="name" placeholder="Название (не более 100 символов)">
+          <select class='select-line full-width' v-model="category">
+            <option value="" disabled selected hidden>Выбирите категорию</option>
+            <option value="Авиация">Авиация</option>
+            <option value="Автомобили">Автомобили</option>
+            <option value="Бронетехника">Бронетехника</option>
+            <option value="Диорамы">Диорамы</option>
+            <option value="Действующие">Действующие</option>
+            <option value="Корабли">Корабли</option>
+            <option value="Ретро">Ретро</option>
+            <option value="Разное">Разное</option>
+          </select>
           <input type="text" maxlength="400" class='input-line full-width' v-model="minitext" placeholder="Краткое описание (не более 400 символов)">
           <textarea class='textarea-line full-width' id="message" name="message" rows="10" cols="50" v-model="fulltext" placeholder="Полное описание"></textarea>
           <VueDatePicker class='input-line full-width' v-model="datestart" :format="customDateFormat" :language="language" placeholder="Дата начала"/>
@@ -45,6 +56,7 @@ export default {
       ModView: true,
       organizer_id: '',
       name: '',
+      category: '',
       minitext:'',
       fulltext: '',
       datestart: '',
@@ -90,6 +102,7 @@ export default {
     CloseFunction(){
       this.ModView = !this.ModView;
       this.name = '';
+      this.category = '';
       this.minitext = '';
       this.fulltext = '';
       this.datestart = '';
@@ -134,6 +147,7 @@ export default {
         return;
       }
       if( this.name === ''      ||
+          this.category === ''  ||
           this.minitext === ''  ||
           this.fulltext === ''  ||
           this.datestart === '' ||
@@ -147,6 +161,7 @@ export default {
       formData.append("imageUrl", this.imageUrl);
       formData.append("userId", this.organizer_id);
       formData.append("name", this.name);
+      formData.append("category", this.category);
       formData.append("datestart", this.datestart);
       formData.append("dateend", this.dateend);
       formData.append("fulltext", this.fulltext);
@@ -165,6 +180,7 @@ export default {
       Concurs.getOneCompetition({id: this.$route.params.id})
           .then((res) =>{
             this.name = res.data.name;
+            this.category = res.data.category;
             this.minitext = res.data.minitext;
             this.fulltext = res.data.fulltext;
             this.criterias = res.data.criterias;
@@ -380,6 +396,31 @@ button:focus {
   position: absolute;
   width: 800px;
   z-index: 1;
+}
+
+.select-line {
+  background: none;
+  margin-bottom: 10px;
+  line-height: 2.4em;
+  color: #fff;
+  font-weight: 300;
+  letter-spacing: 0.02rem;
+  font-size: 1.2rem;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.select-line:focus {
+  border-color: #fff;
+}
+
+.select-line option {
+  background-color: var(--color-main);
 }
 
 .bold-line {

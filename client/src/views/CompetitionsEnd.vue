@@ -1,11 +1,25 @@
 <template>
   <GoPrev :path="'/'"/>
   <AuthForm/>
+  <div>
+    <select class='select-line' v-model="category">
+      <option value="" disabled selected hidden>Фильтр по категориям</option>
+      <option value="">Все</option>
+      <option value="Авиация">Авиация</option>
+      <option value="Автомобили">Автомобили</option>
+      <option value="Бронетехника">Бронетехника</option>
+      <option value="Диорамы">Диорамы</option>
+      <option value="Действующие">Действующие</option>
+      <option value="Корабли">Корабли</option>
+      <option value="Ретро">Ретро</option>
+      <option value="Разное">Разное</option>
+    </select>
+  </div>
   <div class="competitions">
     <div class="emptySpace"></div>
     <div class="list">
       <div v-for="(competition,key) in Competition" :key="key">
-        <div class="listCard">
+        <div class="listCard" v-if="category === '' || category === competition.category">
           <CardCompetition :competition="competition"/>
         </div>
       </div>
@@ -30,7 +44,8 @@ export default {
       Competition: [],
       imageUrl: '',
       width: window.innerWidth,
-      previousPage: null
+      previousPage: null,
+      category: ''
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -77,6 +92,35 @@ export default {
   width: calc(100vw - 360px);
 }
 
+.select-line {
+  position: fixed;
+  top: 20px;
+  left: 100px;
+  z-index: 7;
+  cursor: pointer;
+  background: linear-gradient(var(--color-main), var(--color-main-second));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  -webkit-align-self: flex-end;
+  align-self: flex-end;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 2.5em;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+  height: 50px;
+  width: 250px;
+}
+
+.select-line:hover {
+  opacity: 0.7;
+}
+
+.select-line option {
+  background-color: var(--color-main);
+}
+
 @media (max-width: 1000px) {
   .competitions{
     width: calc(100vw - 20px);
@@ -87,6 +131,12 @@ export default {
   .listCard {
     width: 230px;
     height: 320px;
+  }
+}
+
+@media (max-width: 450px) {
+  .select-line {
+    width: 100px;
   }
 }
 </style>

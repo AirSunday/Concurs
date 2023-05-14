@@ -23,6 +23,7 @@
       <div class="rightContent">
         <p class="TitleCompetition">{{name}}</p>
         <div class="rightContentDown">
+          <p>Категория: {{category}}</p>
           <p>Организатор: {{organizer_name}}</p>
           <p v-if="month > 0">Осталось: {{month}} мес. {{day}} дн.</p>
           <p v-if="month <= 0 && day <= 0">Конкурс закончился</p>
@@ -91,6 +92,7 @@ export default {
   data() {
     return {
       name: '',
+      category: '',
       user_id: '',
       minitext: '',
       fileUrl: '',
@@ -135,6 +137,7 @@ export default {
       Concurs.getOneCompetition({id: pageId})
         .then((res) =>{
           this.name = res.data.name;
+          this.category = res.data.category;
           this.minitext = res.data.minitext;
           this.fulltext = res.data.fulltext;
           this.criterias = res.data.criterias;

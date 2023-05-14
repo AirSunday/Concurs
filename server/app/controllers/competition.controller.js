@@ -42,6 +42,7 @@ exports.create = (req, res) => {
         Competition.create({
             organizer_id: organizer.id,
             name: req.body.name,
+            category: req.body.category,
             minitext: req.body.minitext,
             fulltext: req.body.fulltext,
             datestart: req.body.datestart,
@@ -156,6 +157,7 @@ exports.getCompetition = (req, res) => {
                             return {
                                 id: competition.dataValues.id,
                                 name: competition.dataValues.name,
+                                category: competition.dataValues.category,
                                 minitext: competition.dataValues.minitext,
                                 datestart: competition.dataValues.datestart,
                                 dateend: competition.dataValues.dateend,
@@ -190,6 +192,7 @@ exports.getCompetitionEnd = (req, res) => {
                             return {
                                 id: competition.dataValues.id,
                                 name: competition.dataValues.name,
+                                category: competition.dataValues.category,
                                 minitext: competition.dataValues.minitext,
                                 datestart: competition.dataValues.datestart,
                                 dateend: competition.dataValues.dateend,
@@ -307,6 +310,7 @@ exports.getOneCompetition = async (req, res) => {
         const response = {
             id: competition.id,
             name: competition.name,
+            category: competition.category,
             minitext: competition.minitext,
             fulltext: competition.fulltext,
             datestart: competition.datestart,
@@ -398,6 +402,7 @@ exports.update = async (req, res) => {
     else filename = req.file.filename;
     Competition.update({
         name: req.body.name,
+        category: req.body.category,
         minitext: req.body.minitext,
         fulltext: req.body.fulltext,
         datestart: req.body.datestart,

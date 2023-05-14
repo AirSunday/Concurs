@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
         name: {
             type: Sequelize.TEXT,
         },
+        category: {
+            type: Sequelize.TEXT,
+        },
         minitext: {
             type: Sequelize.TEXT,
         },
