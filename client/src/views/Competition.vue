@@ -4,7 +4,7 @@
   <AuthForm/>
   <div class="competitions">
     <div class="spaceEmpty"></div>
-    <div class="btnCopmetition" v-if="role === 'user' && !(month <= 0 && day <= 0)">
+    <div class="btnCopmetition" v-if="(role === 'user' || countParticipantModel < 3) && !(month <= 0 && day <= 0)">
       <button @click="SendRequestJudge">Стать судьей</button>
       <button @click="$router.push('/add/model/' + $route.params.id)">Отправить модель</button>
     </div>
@@ -118,7 +118,8 @@ export default {
       role: 'user',
       ShowJudgeList: false,
       countApprovalJudge: 0,
-      previousPage: null
+      previousPage: null,
+      countParticipantModel: 4,
     }
   },
   beforeRouteUpdate(to, from, next) {
@@ -191,6 +192,14 @@ export default {
                           else if(isJudge === 'approval')     this.role = 'approval judge';
                           else if(isJudge === 'not approval') this.role = 'not approval judge';
                           else                                this.role = 'user';
+
+                          if(this.role === 'participant')
+                            Concurs.getCountModel({competitionId: this.$route.params.id})
+                                .then(res => {
+                                  if(res.data.count)
+                                    this.countParticipantModel = res.data.count;
+                                })
+                          else this.countParticipantModel = 4;
                         })
                     })
                 })

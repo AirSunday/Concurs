@@ -209,6 +209,10 @@ export default {
   margin: 0;
 }
 
+.winners p{
+  font-size: calc(0.3em + 1vw);
+}
+
 .rangTitile{
   margin-bottom: 15px;
   text-align: center;
@@ -233,14 +237,28 @@ export default {
   .hideText{
     font-size: calc(0.3em + 1vw);
   }
-
+  .winners p{
+    font-size: 20px;
+  }
 }
 
 @media (max-width: 1000px) {
   .hideText{
     font-size: calc(0.7em + 1vw);
   }
+  .winners p{
+    font-size: 18px;
+  }
+}
 
+
+@media (max-width: 400px) {
+  .hideText{
+    font-size: calc(0.7em + 1vw);
+  }
+  .winners p{
+    font-size: 16px;
+  }
 }
 
 </style>

@@ -215,9 +215,16 @@ exports.getCompetitionEnd = (req, res) => {
     });
 }
 
-exports.sendImage = (req, res) => {
+const { promisify } = require('util');
+const access = promisify(fs.access);
+exports.sendImage = async (req, res) => {
     const { filename } = req.params;
-    const filePath = `app/uploads/${filename}`;
+    let filePath = `app/uploads/${filename}`;
+    try {
+        await access(filePath, fs.constants.F_OK);
+    } catch (err) {
+        filePath = 'app/uploads/no_image';
+    }
     const stat = fs.statSync(filePath);
     const fileSize = stat.size;
     const range = req.headers.range;

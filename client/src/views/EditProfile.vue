@@ -70,11 +70,19 @@ export default {
     goToPreviousPage(){
       this.$router.push(this.previousPage || "/");
     },
+    getUser(){
+      Concurs.findUserById({userId: this.authId})
+          .then((user) => {
+            this.Name = user.data.name;
+            this.Email = user.data.email;
+          })
+    },
     CheckSession() {
       Concurs.Authentication()
         .then(response => {
           if (response && response.data.userId != 0) {
             this.authId = response.data.userId;
+            this.getUser();
           }
           else {
             this.$router.push({ path: this.previousPage });

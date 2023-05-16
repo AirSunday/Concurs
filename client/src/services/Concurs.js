@@ -96,6 +96,13 @@ class Concurs {
       }
     });
   }
+  getCountModel(data) {
+    return http.post(`/model/getCountModel`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   getScore(data) {
     return http.post(`/model/getScore`, data, {
       headers: {

@@ -244,3 +244,24 @@ exports.GetModelImages = async (req, res) => {
         });
     }
 }
+
+exports.getCountModel = async (req, res) => {
+    try {
+        const competitionId = req.body.competitionId;
+        const userId = await FindSession(req);
+        const participants = await Participant.findAll({ where: { person_id: userId } });
+
+        let count = 0;
+        for (const participant of participants) {
+            const model = await Model.findOne({ where: { participant: participant.id, competitiondbId: competitionId } });
+            if (model) {
+                count++;
+            }
+        }
+
+        res.send({ count: count });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'An error occurred' });
+    }
+}

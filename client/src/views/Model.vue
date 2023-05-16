@@ -495,6 +495,7 @@ export default {
   object-fit: cover;
   width: 40vw;
   height: 40vh;
+  border-radius: 21px 0 0 21px;
 }
 
 .right img {

@@ -72,15 +72,12 @@ export default {
 
 <style scoped>
 
-.list{
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-}
 
 .listCard {
-  width: 410px;
-  height: 530px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  width: calc(100vw - 360px);
 }
 
 .emptySpace{
@@ -123,21 +120,9 @@ export default {
 }
 
 @media (max-width: 1000px) {
-  .competitions{
-    width: calc(100vw - 20px);
-  }
-}
-
-@media (max-width: 600px) {
   .listCard {
-    width: 230px;
-    height: 320px;
+    width: calc(100vw);
   }
 }
 
-@media (max-width: 450px) {
-  .select-line {
-    width: 100px;
-  }
-}
 </style>

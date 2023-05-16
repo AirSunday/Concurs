@@ -64,6 +64,8 @@ module.exports = (app) => {
   //
   router.post("/model/GetModelImages", model.GetModelImages);
   //
+  router.post("/model/getCountModel", model.getCountModel);
+  //
   router.post("/model/getScore", model.getScore);
   //
   router.get("/image/:filename", competition.sendImage);
