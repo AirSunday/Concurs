@@ -17,8 +17,8 @@ require("./app/models/session.model.js");
 app.use(
   cors({
     origin: [
-      // "https://whoisa.ru",
-      "http://80.249.147.79:8081",
+      "https://whoisa.ru",
+      // "http://80.249.147.79:8081",
       // 'http://localhost:8081',
     ],
     credentials: true,
@@ -28,8 +28,8 @@ app.use(
 
 app.use(function (req, res, next) {
   // res.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
-  // res.setHeader("Access-Control-Allow-Origin", "https://whoisa.ru");
-  res.setHeader("Access-Control-Allow-Origin", "http://80.249.147.79:8081");
+  res.setHeader("Access-Control-Allow-Origin", "https://whoisa.ru");
+  // res.setHeader("Access-Control-Allow-Origin", "http://80.249.147.79:8081");
 
   res.setHeader(
     "Access-Control-Allow-Methods",

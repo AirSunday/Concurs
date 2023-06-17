@@ -30,8 +30,8 @@ services:
     build: client/
     image: airsunday/vue-app
     ports:
-      - 8081:8081
-#      - 443:443
+      - 80:8080
+      - 443:443
     depends_on:
       - node
 
